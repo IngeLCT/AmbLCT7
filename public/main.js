@@ -15,6 +15,7 @@ const sensorDataRef = database.ref('/ultima_medicion');
 let fechaInicioGlobal = null;
 let horaInicioGlobal = null;
 let ubicacionGlobal = null;
+let ESPIDGlobal = null;
 
 // Al iniciar la página, leer el primer registro del historial
 const historialRef = database.ref('/historial_mediciones').orderByKey().limitToFirst(1);
@@ -26,6 +27,7 @@ historialRef.once('value', (snapshot) => {
     fechaInicioGlobal = entry.fecha || null;
     horaInicioGlobal = entry.inicio || null;
     ubicacionGlobal = entry.ciudad || null;
+    ESPIDGlobal = entry.id || null;
   }
 });
 
@@ -55,6 +57,10 @@ sensorDataRef.on('value', (snapshot) => {
       <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
       <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
       <strong>Tiempo transcurrido:</strong> ${data.tiempo ?? '0'}
+    `;
+
+    IDBCursor.innerHTML= `
+    <h2>ID:</h2> ${ESPIDGlobal ?? '---'} 
     `;
   }
 });
