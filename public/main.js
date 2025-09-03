@@ -61,7 +61,7 @@ sensorDataRef.on('value', (snapshot) => {
     `;
 
     IDBCursor.innerHTML= `
-    <h2>ID:</h2> ${ESPIDGlobal ?? '---'} 
+    <strong>ID:</strong> ${ESPIDGlobal ?? '---'}  <br>
     `;
   }
 });
