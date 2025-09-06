@@ -33,42 +33,50 @@ historialRef.once('value', (snapshot) => {
   }
 });
 
-// Lectura en tiempo real del último registro del historial
-lastMeasurementRef.on('value', (snapshot) => {
-  const obj = snapshot.val();
-  const data = obj ? Object.values(obj)[0] : null; // Último registro
+// Función de render reutilizable
+function renderUltimaMedicion(data) {
+  if (!data) return;
   const dataTable = document.getElementById("data-table");
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");
 
-  if (data) {
-    let tableHTML = `
-      <tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>
-      <tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-      <tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>
-      <tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-      <tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-      <tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>
-      <tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>
-      <tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>
-      <tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>
-      <tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>
-    `;
-    dataTable.innerHTML = tableHTML;
+  const tableHTML = `
+    <tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>
+    <tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>
+    <tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>
+    <tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>
+    <tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>
+    <tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>
+    <tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>
+    <tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>
+    <tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>
+    <tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>
+  `;
+  dataTable.innerHTML = tableHTML;
 
-    // NO MODIFICAR: mantiene exactamente el mismo bloque solicitado
-    timeInfo.innerHTML = `
-      <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
-      <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
-      <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
-      <strong>Tiempo transcurrido:</strong> ${data.tiempo ?? '0'}
-    `;
+  // NO MODIFICAR
+  timeInfo.innerHTML = `
+    <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
+    <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
+    <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
+    <strong>Tiempo transcurrido:</strong> ${data.tiempo ?? '0'}
+  `;
 
-    // NO MODIFICAR
-    IDBCursor.innerHTML= `
-    <strong>ID:</strong> ${ESPIDGlobal ?? '---'}  <br>
-    `;
-  }
+  // NO MODIFICAR
+  IDBCursor.innerHTML= `
+  <strong>ID:</strong> ${ESPIDGlobal ?? '---'}  <br>
+  `;
+}
+
+// Suscripción a nuevos registros y cambios sobre el último
+const historialRootRef = database.ref('/historial_mediciones');
+// child_added se dispara para el último existente (por limitToLast) y luego para cada nuevo push
+historialRootRef.limitToLast(1).on('child_added', snap => {
+  renderUltimaMedicion(snap.val());
+});
+// Si el último registro se actualiza después de creado
+historialRootRef.limitToLast(1).on('child_changed', snap => {
+  renderUltimaMedicion(snap.val());
 });
 
 // CSV
