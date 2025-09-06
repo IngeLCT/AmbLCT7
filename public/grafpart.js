@@ -1,12 +1,23 @@
 // grafpart.js
 window.addEventListener("load", () => {
   const MAX_POINTS = 15; // siempre mostrar últimos 15
-  // Mensaje de carga opcional: insertar texto si no hay barras aún
-  const placeholders = ["chartPM1","chartPM2_5","chartPM4_0","chartPM10"];
-  placeholders.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<div style="padding:8px;font-size:14px;color:#333">Cargando...</div>';
-  });
+
+  const loadingClass = 'loading-msg';
+  ["chartPM1","chartPM2_5","chartPM4_0","chartPM10"].forEach(addLoading);
+
+  let firstData = false;
+  function removeLoading(){
+    if(firstData) return; firstData = true;
+    document.querySelectorAll('.loading-msg').forEach(n=>n.remove());
+  }
+  function addLoading(divId){
+    const el = document.getElementById(divId);
+    if(!el) return;
+    el.style.position = 'relative';
+    if(!el.querySelector('.'+loadingClass)){
+      el.insertAdjacentHTML('afterbegin', '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:18px;font-weight:bold;color:#154360;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>');
+    }
+  }
 
   function initBar(divId, label, color, yMin, yMax) {
     Plotly.newPlot(divId, [{
@@ -79,13 +90,14 @@ window.addEventListener("load", () => {
     const dataObj = snap.val();
     if (!dataObj) return;
     const entries = Object.entries(dataObj); // [key, value]
-    entries.forEach(([key, val]) => {
+  entries.forEach(([key, val]) => {
       const label = val.tiempo || key.slice(-5); // fallback
       sPM1.addPoint(key, label, val.pm1p0 ?? 0);
       sPM25.addPoint(key, label, val.pm2p5 ?? 0);
       sPM40.addPoint(key, label, val.pm4p0 ?? 0);
       sPM10.addPoint(key, label, val.pm10p0 ?? 0);
     });
+  removeLoading();
   });
 
   // Escuchar nuevos (después de los ya cargados)
