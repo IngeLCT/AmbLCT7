@@ -1,6 +1,12 @@
 // grafpart.js
 window.addEventListener("load", () => {
   const MAX_POINTS = 15; // siempre mostrar últimos 15
+  // Mensaje de carga opcional: insertar texto si no hay barras aún
+  const placeholders = ["chartPM1","chartPM2_5","chartPM4_0","chartPM10"];
+  placeholders.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<div style="padding:8px;font-size:14px;color:#333">Cargando...</div>';
+  });
 
   function initBar(divId, label, color, yMin, yMax) {
     Plotly.newPlot(divId, [{

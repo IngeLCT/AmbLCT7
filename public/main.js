@@ -19,6 +19,15 @@ let horaInicioGlobal = null;
 let ubicacionGlobal = null;
 let ESPIDGlobal = null;
 
+// Mensaje de carga inicial hasta primera medición
+try {
+  const tbl = document.getElementById('data-table');
+  if (tbl && !tbl.dataset.loadingInit) {
+    tbl.dataset.loadingInit = '1';
+    tbl.innerHTML = '<tr><td>Cargando...</td></tr>';
+  }
+} catch(e) { /* ignorar si DOM no está listo */ }
+
 // Al iniciar la página, leer el primer registro del historial
 const historialRef = database.ref('/historial_mediciones').orderByKey().limitToFirst(1);
 
@@ -36,6 +45,9 @@ historialRef.once('value', (snapshot) => {
 // Función de render reutilizable
 function renderUltimaMedicion(data) {
   if (!data) return;
+  if (!renderUltimaMedicion.first) {
+    renderUltimaMedicion.first = true; // primera vez
+  }
   const dataTable = document.getElementById("data-table");
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");

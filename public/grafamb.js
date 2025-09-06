@@ -1,6 +1,7 @@
 // grafamb.js
 window.addEventListener('load', () => {
   const MAX_POINTS = 15;
+  ['CO2','TEM','HUM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<div style="padding:8px;font-size:14px;color:#333">Cargando...</div>'; });
 
   function initBar(divId, label, color, yMin, yMax){
     Plotly.newPlot(divId,[{x:[],y:[],type:'bar',name:label,marker:{color}}],{
