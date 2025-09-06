@@ -67,16 +67,21 @@ initPlot("VOC", "VOC index", "#ff8000", 0, 500);
 initPlot("NOx", "NOx index", "#ff0040", 0, 200);
 
 const database = firebase.database();
-const ref = database.ref("/ultima_medicion");
+const lastRef = database.ref("/historial_mediciones").limitToLast(1);
 
-  ref.on("value", (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
+lastRef.on('child_added', snap => {
+  const data = snap.val();
+  if (!data) return;
+  const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
+  updatePlot("VOC", timestamp, data.voc ?? 0);
+  updatePlot("NOx", timestamp, data.nox ?? 0);
+});
 
-    const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
-
-    updatePlot("VOC", timestamp, data.voc ?? 0);
-    updatePlot("NOx", timestamp, data.nox ?? 0);
-
-  });
+lastRef.on('child_changed', snap => {
+  const data = snap.val();
+  if (!data) return;
+  const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
+  updatePlot("VOC", timestamp, data.voc ?? 0);
+  updatePlot("NOx", timestamp, data.nox ?? 0);
+});
 });

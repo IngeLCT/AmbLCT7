@@ -68,19 +68,28 @@ window.addEventListener("load", () => {
   initPlot("chartPM4_0", "PM4.0 µg/m³", "green", 0, 500);
   initPlot("chartPM10", "PM10.0 µg/m³", "#bf00ff", 0, 400);
 
+  // Cambio: ahora tomamos solo el último registro insertado en /historial_mediciones
   const database = firebase.database();
-  const ref = database.ref("/ultima_medicion");
+  const lastRef = database.ref("/historial_mediciones").limitToLast(1);
 
-  ref.on("value", (snapshot) => {
-    const data = snapshot.val();
+  lastRef.on('child_added', snap => {
+    const data = snap.val();
     if (!data) return;
-
     const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
-
     updatePlot("chartPM1", timestamp, data.pm1p0 ?? 0);
     updatePlot("chartPM2_5", timestamp, data.pm2p5 ?? 0);
     updatePlot("chartPM4_0", timestamp, data.pm4p0 ?? 0);
     updatePlot("chartPM10", timestamp, data.pm10p0 ?? 0);
+  });
 
+  // Si el firmware decidiera actualizar el último nodo en lugar de crear uno nuevo, podríamos escuchar child_changed:
+  lastRef.on('child_changed', snap => {
+    const data = snap.val();
+    if (!data) return;
+    const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
+    updatePlot("chartPM1", timestamp, data.pm1p0 ?? 0);
+    updatePlot("chartPM2_5", timestamp, data.pm2p5 ?? 0);
+    updatePlot("chartPM4_0", timestamp, data.pm4p0 ?? 0);
+    updatePlot("chartPM10", timestamp, data.pm10p0 ?? 0);
   });
 });

@@ -68,16 +68,16 @@ window.addEventListener("load", () => {
   initPlot("HUM", "Humedad Relativa %", "#0000cc", 0, 100);
 
   const db = firebase.database();
-  const ref = db.ref("/ultima_medicion");
+  const lastRef = db.ref("/historial_mediciones").limitToLast(1);
 
-  ref.on("value", (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
-
+  function handle(data){
+    if(!data) return;
     const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
-
     updatePlot("CO2", timestamp, data.co2 ?? 0);
     updatePlot("TEM", timestamp, data.cTe ?? 0);
     updatePlot("HUM", timestamp, data.cHu ?? 0);
-  });
+  }
+
+  lastRef.on('child_added', snap => handle(snap.val()));
+  lastRef.on('child_changed', snap => handle(snap.val()));
 });
