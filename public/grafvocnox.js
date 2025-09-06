@@ -1,87 +1,29 @@
 // gravocnox.js
-window.addEventListener("load", () => {
-  const MAX_DATA_POINTS = 20;
+window.addEventListener('load', () => {
+  const MAX_POINTS = 15;
 
-  function initPlot(divId, label, color, yMin, yMax) {
-    Plotly.newPlot(divId, [{
-      x: [],
-      y: [],
-      mode: 'lines',
-      name: label,
-      line: { color: color }
-    }], {
-      title: {
-        text: label,
-        font: { size: 20, color: 'black', family: 'Arial', weight: 'bold' }
-      },
-      xaxis: {
-        title: {
-          text: 'Tiempo Transcurrido',
-          font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
-          standoff: 20  // separa el título de los ticks
-        },
-        tickfont: {
-          color: 'black',
-          size: 14,
-          family: 'Arial',
-          weight: 'bold'
-        },
-        tickangle: -45,  // puedes ajustar a -30 o -60 si prefieres
-        gridcolor: 'black',
-        linecolor: 'black',
-        zeroline: false
-      },
-      yaxis: {
-        title: {
-          text: label,
-          font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' }
-        },
-        tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
-        gridcolor: 'black',
-        linecolor: 'black',
-        zeroline: false,
-        range: (yMin !== null && yMax !== null) ? [yMin, yMax] : undefined
-      },
-      plot_bgcolor: "#cce5dc",
-      paper_bgcolor: "#cce5dc",
-      margin: { t: 50, l: 60, r: 40, b: 80 },  // margen inferior aumentado
+  function initBar(divId, label, color, yMin, yMax) {
+    Plotly.newPlot(divId, [{ x: [], y: [], type: 'bar', name: label, marker: { color } }], {
+      title: { text: label, font: { size: 20, color: 'black', family: 'Arial', weight: 'bold' } },
+      xaxis: { title: { text: 'Tiempo', font: { size: 14 } }, tickangle: -40 },
+      yaxis: { title: { text: label }, range: (yMin!==null&&yMax!==null)?[yMin,yMax]:undefined },
+      plot_bgcolor: '#cce5dc', paper_bgcolor: '#cce5dc', margin: { t:50,l:60,r:30,b:90 }, bargap:0.2
     });
   }
 
-  function updatePlot(divId, timeLabel, value) {
-    Plotly.extendTraces(divId, {
-      x: [[timeLabel]],
-      y: [[value]]
-    }, [0]);
+  function Series(divId){ this.divId=divId; this.x=[]; this.y=[]; this.keys=[]; }
+  Series.prototype.add=function(key,label,val){ if(this.keys.includes(key))return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){this.x.shift();this.y.shift();this.keys.shift();} Plotly.react(this.divId,[{x:this.x,y:this.y,type:'bar'}],{}); };
+  Series.prototype.update=function(key,val){ const i=this.keys.indexOf(key); if(i===-1)return; this.y[i]=val; Plotly.restyle(this.divId,{y:[this.y]}); };
 
-    const graphDiv = document.getElementById(divId);
-    const xLen = graphDiv.data[0].x.length;
-    if (xLen > MAX_DATA_POINTS) {
-      Plotly.relayout(divId, {
-        'xaxis.range': [xLen - MAX_DATA_POINTS, xLen]
-      });
-    }
-  }
+  initBar('VOC','VOC index','#ff8000',0,500);
+  initBar('NOx','NOx index','#ff0040',0,200);
+  const sVOC=new Series('VOC');
+  const sNOx=new Series('NOx');
 
-initPlot("VOC", "VOC index", "#ff8000", 0, 500);
-initPlot("NOx", "NOx index", "#ff0040", 0, 200);
+  const db=firebase.database();
+  const base=db.ref('/historial_mediciones').orderByKey().limitToLast(MAX_POINTS);
+  base.once('value',snap=>{ const obj=snap.val(); if(!obj)return; Object.entries(obj).forEach(([k,v])=>{ const label=v.tiempo||k.slice(-5); sVOC.add(k,label,v.voc??0); sNOx.add(k,label,v.nox??0); }); });
 
-const database = firebase.database();
-const lastRef = database.ref("/historial_mediciones").limitToLast(1);
-
-lastRef.on('child_added', snap => {
-  const data = snap.val();
-  if (!data) return;
-  const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
-  updatePlot("VOC", timestamp, data.voc ?? 0);
-  updatePlot("NOx", timestamp, data.nox ?? 0);
-});
-
-lastRef.on('child_changed', snap => {
-  const data = snap.val();
-  if (!data) return;
-  const timestamp = data.tiempo ?? new Date().toLocaleTimeString();
-  updatePlot("VOC", timestamp, data.voc ?? 0);
-  updatePlot("NOx", timestamp, data.nox ?? 0);
-});
+  db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.tiempo||k.slice(-5); sVOC.add(k,label,v.voc??0); sNOx.add(k,label,v.nox??0); });
+  db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,v.voc??0); sNOx.update(k,v.nox??0); });
 });
