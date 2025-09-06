@@ -12,7 +12,7 @@ window.addEventListener('load', () => {
   }
 
   function Series(divId){ this.divId=divId; this.x=[]; this.y=[]; this.keys=[]; }
-  Series.prototype.add=function(key,label,val){ if(this.keys.includes(key))return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){this.x.shift();this.y.shift();this.keys.shift();} Plotly.react(this.divId,[{x:this.x,y:this.y,type:'bar'}],{}); };
+  Series.prototype.add=function(key,label,val){ if(this.keys.includes(key))return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){this.x.shift();this.y.shift();this.keys.shift();} Plotly.update(this.divId,{x:[this.x],y:[this.y]}); };
   Series.prototype.update=function(key,val){ const i=this.keys.indexOf(key); if(i===-1)return; this.y[i]=val; Plotly.restyle(this.divId,{y:[this.y]}); };
 
   initBar('CO2','CO2 ppm','#990000',300,1000);

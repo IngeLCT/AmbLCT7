@@ -44,7 +44,8 @@ window.addEventListener("load", () => {
       this.y.shift();
       this.keys.shift();
     }
-    Plotly.react(this.divId, [{ x: this.x, y: this.y, type: 'bar', marker: { color: Plotly.d3.select('#'+this.divId).data() } }], {} , {staticPlot:false});
+    // Mantener layout y color originales sin resetear fondo
+    Plotly.update(this.divId, { x: [this.x], y: [this.y] });
   };
   BarSeries.prototype.updatePoint = function(key, newValue) {
     const idx = this.keys.indexOf(key);
