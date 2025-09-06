@@ -10,7 +10,9 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-const sensorDataRef = database.ref('/ultima_medicion');
+// Eliminado el uso de /ultima_medicion. Ahora todo se obtiene desde /historial_mediciones.
+// Referencia en tiempo real al último registro del historial
+const lastMeasurementRef = database.ref('/historial_mediciones').orderByKey().limitToLast(1);
 
 let fechaInicioGlobal = null;
 let horaInicioGlobal = null;
@@ -31,9 +33,10 @@ historialRef.once('value', (snapshot) => {
   }
 });
 
-// Lectura en tiempo real
-sensorDataRef.on('value', (snapshot) => {
-  const data = snapshot.val();
+// Lectura en tiempo real del último registro del historial
+lastMeasurementRef.on('value', (snapshot) => {
+  const obj = snapshot.val();
+  const data = obj ? Object.values(obj)[0] : null; // Último registro
   const dataTable = document.getElementById("data-table");
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");
@@ -53,6 +56,7 @@ sensorDataRef.on('value', (snapshot) => {
     `;
     dataTable.innerHTML = tableHTML;
 
+    // NO MODIFICAR: mantiene exactamente el mismo bloque solicitado
     timeInfo.innerHTML = `
       <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
       <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
@@ -60,6 +64,7 @@ sensorDataRef.on('value', (snapshot) => {
       <strong>Tiempo transcurrido:</strong> ${data.tiempo ?? '0'}
     `;
 
+    // NO MODIFICAR
     IDBCursor.innerHTML= `
     <strong>ID:</strong> ${ESPIDGlobal ?? '---'}  <br>
     `;
