@@ -6,8 +6,8 @@ window.addEventListener('load', () => {
   function initBar(divId, label, color, yMin, yMax) {
     Plotly.newPlot(divId, [{ x: [], y: [], type: 'bar', name: label, marker: { color } }], {
       title: { text: label, font: { size: 20, color: 'black', family: 'Arial', weight: 'bold' } },
-      // 'Tiempo' -> 'Hora'
-      xaxis: { title: { text: 'Hora', font: { size: 14 } }, tickangle: -40 },
+  // 'Tiempo' -> 'Hora de Medición'
+  xaxis: { title: { text: 'Hora de Medición', font: { size: 14 } }, tickangle: -40 },
       yaxis: { title: { text: label }, range: (yMin!==null&&yMax!==null)?[yMin,yMax]:undefined },
       plot_bgcolor: '#cce5dc', paper_bgcolor: '#cce5dc', margin: { t:50,l:60,r:30,b:90 }, bargap:0.2
     });

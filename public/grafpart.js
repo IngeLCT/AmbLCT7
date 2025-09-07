@@ -29,8 +29,8 @@ window.addEventListener("load", () => {
     }], {
       title: { text: label, font: { size: 20, color: 'black', family: 'Arial', weight: 'bold' } },
       xaxis: {
-        // Cambiado 'Tiempo' -> 'Hora'
-        title: { text: 'Hora', font: { size: 14, color: 'black', family: 'Arial', weight: 'bold' } },
+  // Cambiado 'Tiempo' -> 'Hora de Medición'
+  title: { text: 'Hora de Medición', font: { size: 14, color: 'black', family: 'Arial', weight: 'bold' } },
         tickfont: { color: 'black', size: 12, family: 'Arial', weight: 'bold' },
         tickangle: -40
       },
