@@ -74,21 +74,46 @@ function renderUltimaMedicion(data) {
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");
 
+  // Lista de campos de medición que (según tu descripción) sólo se envían la primera vez
+  const camposMediciones = [
+    'pm1p0','pm2p5','pm4p0','pm10p0','voc','nox','co2','cTe','cHu'
+  ];
+
+  // Guardar los valores originales la primera vez
+  if (!renderUltimaMedicion.baseMediciones) {
+    renderUltimaMedicion.baseMediciones = {};
+    camposMediciones.forEach(k => {
+      renderUltimaMedicion.baseMediciones[k] = (data[k] !== undefined && data[k] !== null) ? data[k] : '0';
+    });
+  } else {
+    // Si en algún momento SÍ llega un nuevo valor real, actualizar la base
+    camposMediciones.forEach(k => {
+      if (data[k] !== undefined && data[k] !== null && data[k] !== '') {
+        renderUltimaMedicion.baseMediciones[k] = data[k];
+      }
+    });
+  }
+
+  // Valor de hora más reciente
+  renderUltimaMedicion.ultimaHora = data.hora || renderUltimaMedicion.ultimaHora || '---';
+
+  const base = renderUltimaMedicion.baseMediciones;
+
   // Asegurar que encabezado exista (si alguien limpió la tabla)
   if (!dataTable.querySelector('th')) {
     dataTable.innerHTML = '<tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>';
   }
   // Construir filas de datos (sin reponer encabezado)
   const rows = [
-    `<tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>`,
-    `<tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>`,
-    `<tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>`,
-    `<tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>`,
-    `<tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>`
+    `<tr> <td>PM1.0</td> <td>${base.pm1p0}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM2.5</td> <td>${base.pm2p5}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM4.0</td> <td>${base.pm4p0}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM10.0</td> <td>${base.pm10p0}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>VOC</td> <td>${base.voc}</td> <td>Index</td> </tr>`,
+    `<tr> <td>NOx</td> <td>${base.nox}</td> <td>Index</td> </tr>`,
+    `<tr> <td>CO2</td> <td>${base.co2}</td> <td>ppm</td> </tr>`,
+    `<tr> <td>Temperatura</td> <td>${base.cTe}</td> <td>°C</td> </tr>`,
+    `<tr> <td>Humedad Relativa</td> <td>${base.cHu}</td> <td>%</td> </tr>`
   ];
   // Reemplazar todo menos el encabezado
   const header = dataTable.querySelector('tr');
@@ -99,7 +124,7 @@ function renderUltimaMedicion(data) {
     <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
     <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
     <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
-    <strong>Hora Ultima Medición:</strong> ${data.tiempo ?? '0'}
+  <strong>Hora Ultima Medición:</strong> ${renderUltimaMedicion.ultimaHora}
   `;
 
   // NO MODIFICAR
@@ -133,7 +158,7 @@ function descargarCSV() {
     const headers = [
       "pm1.0", "pm2.5", "pm4.0", "pm10.0",
       "voc", "nox", "co2", "Temperatura", "HumedadRelativa",
-      "fechaDeInicio", "HoraDeInicio", "ubicacion", "TiempoTranscurrido"
+      "fechaDeInicio", "HoraDeInicio", "ubicacion", "HoraMedicion"
     ];
 
     const keyMap = {
@@ -149,7 +174,7 @@ function descargarCSV() {
       "fechaDeInicio": "fecha",
       "HoraDeInicio": "inicio",
       "ubicacion": "ciudad",
-      "TiempoTranscurrido": "tiempo"
+      "HoraMedicion": "hora"
     };
 
     function parseTiempo(tiempoStr) {
