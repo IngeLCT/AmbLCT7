@@ -35,7 +35,7 @@ csvFileInput.addEventListener('change', () => {
             };
 
             currentLoadedData = parsedData.sort((a, b) => {
-                return parseTimeToSeconds(a.tiempo) - parseTimeToSeconds(b.tiempo);
+                return parseTimeToSeconds(a.hora) - parseTimeToSeconds(b.hora);
             });
 
             if (currentLoadedData.length === 0) {
@@ -99,7 +99,7 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
         },
         xaxis: {
             title: {
-                text: 'Tiempo Transcurrido',
+                text: 'Hora de Medición',
                 font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
                 standoff: 20
             },
@@ -148,7 +148,7 @@ function updateChartInRange() {
 
     const slice = currentLoadedData.slice(start, end + 1);
     const values = slice.map(row => parseFloat(row[key])).filter(v => !isNaN(v));
-    const labels = slice.map(row => row.TiempoTranscurrido);
+    const labels = slice.map(row => row.hora);
 
     createOrUpdatePlotly(values, label, labels);
 }
@@ -194,11 +194,11 @@ const MaxVlaueBubbleStyle = () => {
 };
 const setMinValueOutput = () => {
   minRange = parseInt(rangeInputs[0].value);
-  minBubble.innerHTML = currentLoadedData[minRange]?.TiempoTranscurrido || '';
+    minBubble.innerHTML = currentLoadedData[minRange]?.hora || '';
 };
 const setMaxValueOutput = () => {
   maxRange = parseInt(rangeInputs[1].value);
-  maxBubble.innerHTML = currentLoadedData[maxRange]?.TiempoTranscurrido || '';
+    maxBubble.innerHTML = currentLoadedData[maxRange]?.hora || '';
 };
 
 rangeInputs.forEach((input) => {
@@ -248,7 +248,7 @@ function updateDataTable(dataSlice, key) {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  ['#', 'Tiempo', key.toUpperCase()].forEach(text => {
+    ['#', 'Hora', key.toUpperCase()].forEach(text => {
     const th = document.createElement('th');
     th.textContent = text;
     headerRow.appendChild(th);
@@ -265,7 +265,7 @@ function updateDataTable(dataSlice, key) {
     tr.appendChild(tdIndex);
 
     const tdTime = document.createElement('td');
-    tdTime.textContent = row.TiempoTranscurrido || '-';
+    tdTime.textContent = row.hora || '-';
     tr.appendChild(tdTime);
 
     const tdValue = document.createElement('td');
@@ -291,7 +291,7 @@ function updateChartInRange() {
 
   const slice = currentLoadedData.slice(start, end + 1);
   const values = slice.map(row => parseFloat(row[key])).filter(v => !isNaN(v));
-  const labels = slice.map(row => row.TiempoTranscurrido);
+    const labels = slice.map(row => row.hora);
 
   createOrUpdatePlotly(values, label, labels);
   currentPage = 1;
