@@ -19,14 +19,33 @@ let horaInicioGlobal = null;
 let ubicacionGlobal = null;
 let ESPIDGlobal = null;
 
-// Mensaje de carga inicial hasta primera medición
-try {
+// Preparar tabla vacía con encabezados y mensaje "Esperando Datos" arriba
+function prepararTablaVacia() {
   const tbl = document.getElementById('data-table');
-  if (tbl && !tbl.dataset.loadingInit) {
-    tbl.dataset.loadingInit = '1';
-    tbl.innerHTML = '<tr><td>Cargando...</td></tr>';
+  if (tbl && !tbl.dataset.prepared) {
+    tbl.dataset.prepared = '1';
+    tbl.innerHTML = `
+      <tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>
+    `; // sin filas de datos todavía
   }
-} catch(e) { /* ignorar si DOM no está listo */ }
+  if (!document.getElementById('waiting-msg')) {
+    const msg = document.createElement('div');
+    msg.id = 'waiting-msg';
+    msg.style.cssText = 'margin:10px 0;font-size:20px;font-weight:bold;color:#154360;letter-spacing:.5px;text-align:left;';
+    msg.textContent = 'Esperando Datos';
+    const tableEl = document.getElementById('data-table');
+    if (tableEl && tableEl.parentNode) {
+      tableEl.parentNode.insertBefore(msg, tableEl); // insertar arriba de la tabla
+    }
+  }
+}
+
+// Ejecutar una vez al cargar el script (si el DOM ya está) o esperar al load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', prepararTablaVacia);
+} else {
+  prepararTablaVacia();
+}
 
 // Al iniciar la página, leer el primer registro del historial
 const historialRef = database.ref('/historial_mediciones').orderByKey().limitToFirst(1);
@@ -45,6 +64,9 @@ historialRef.once('value', (snapshot) => {
 // Función de render reutilizable
 function renderUltimaMedicion(data) {
   if (!data) return;
+  // Quitar mensaje de espera si existe
+  const wait = document.getElementById('waiting-msg');
+  if (wait) wait.remove();
   if (!renderUltimaMedicion.first) {
     renderUltimaMedicion.first = true; // primera vez
   }
@@ -52,26 +74,32 @@ function renderUltimaMedicion(data) {
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");
 
-  const tableHTML = `
-    <tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>
-    <tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-    <tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>
-    <tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-    <tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>
-    <tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>
-    <tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>
-    <tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>
-    <tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>
-    <tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>
-  `;
-  dataTable.innerHTML = tableHTML;
+  // Asegurar que encabezado exista (si alguien limpió la tabla)
+  if (!dataTable.querySelector('th')) {
+    dataTable.innerHTML = '<tr> <th>Mediciones</th> <th>Valor</th> <th>Unidad</th> </tr>';
+  }
+  // Construir filas de datos (sin reponer encabezado)
+  const rows = [
+    `<tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>`,
+    `<tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>`,
+    `<tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>`,
+    `<tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>`,
+    `<tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>`
+  ];
+  // Reemplazar todo menos el encabezado
+  const header = dataTable.querySelector('tr');
+  dataTable.innerHTML = header.outerHTML + rows.join('');
 
   // NO MODIFICAR
   timeInfo.innerHTML = `
     <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
     <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
     <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
-    <strong>Tiempo transcurrido:</strong> ${data.tiempo ?? '0'}
+    <strong>Hora Ultima Medición:</strong> ${data.tiempo ?? '0'}
   `;
 
   // NO MODIFICAR
