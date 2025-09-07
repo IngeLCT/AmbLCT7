@@ -35,7 +35,7 @@ csvFileInput.addEventListener('change', () => {
             };
 
             currentLoadedData = parsedData.sort((a, b) => {
-                return parseTimeToSeconds(a.hora) - parseTimeToSeconds(b.hora);
+                return parseTimeToSeconds(a.HoraMedicion) - parseTimeToSeconds(b.HoraMedicion);
             });
 
             if (currentLoadedData.length === 0) {
@@ -148,7 +148,7 @@ function updateChartInRange() {
 
     const slice = currentLoadedData.slice(start, end + 1);
     const values = slice.map(row => parseFloat(row[key])).filter(v => !isNaN(v));
-    const labels = slice.map(row => row.hora);
+    const labels = slice.map(row => row.HoraMedicion);
 
     createOrUpdatePlotly(values, label, labels);
 }
@@ -194,11 +194,11 @@ const MaxVlaueBubbleStyle = () => {
 };
 const setMinValueOutput = () => {
   minRange = parseInt(rangeInputs[0].value);
-    minBubble.innerHTML = currentLoadedData[minRange]?.hora || '';
+    minBubble.innerHTML = currentLoadedData[minRange]?.HoraMedicion || '';
 };
 const setMaxValueOutput = () => {
   maxRange = parseInt(rangeInputs[1].value);
-    maxBubble.innerHTML = currentLoadedData[maxRange]?.hora || '';
+    maxBubble.innerHTML = currentLoadedData[maxRange]?.HoraMedicion || '';
 };
 
 rangeInputs.forEach((input) => {
@@ -248,7 +248,7 @@ function updateDataTable(dataSlice, key) {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-    ['#', 'Hora', key.toUpperCase()].forEach(text => {
+    ['#', 'HoraMedicion', key.toUpperCase()].forEach(text => {
     const th = document.createElement('th');
     th.textContent = text;
     headerRow.appendChild(th);
@@ -265,7 +265,7 @@ function updateDataTable(dataSlice, key) {
     tr.appendChild(tdIndex);
 
     const tdTime = document.createElement('td');
-    tdTime.textContent = row.hora || '-';
+    tdTime.textContent = row.HoraMedicion || '-';
     tr.appendChild(tdTime);
 
     const tdValue = document.createElement('td');
@@ -291,7 +291,7 @@ function updateChartInRange() {
 
   const slice = currentLoadedData.slice(start, end + 1);
   const values = slice.map(row => parseFloat(row[key])).filter(v => !isNaN(v));
-    const labels = slice.map(row => row.hora);
+    const labels = slice.map(row => row.HoraMedicion);
 
   createOrUpdatePlotly(values, label, labels);
   currentPage = 1;
