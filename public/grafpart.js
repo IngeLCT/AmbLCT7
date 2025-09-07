@@ -29,7 +29,8 @@ window.addEventListener("load", () => {
     }], {
       title: { text: label, font: { size: 20, color: 'black', family: 'Arial', weight: 'bold' } },
       xaxis: {
-        title: { text: 'Tiempo', font: { size: 14, color: 'black', family: 'Arial', weight: 'bold' } },
+        // Cambiado 'Tiempo' -> 'Hora'
+        title: { text: 'Hora', font: { size: 14, color: 'black', family: 'Arial', weight: 'bold' } },
         tickfont: { color: 'black', size: 12, family: 'Arial', weight: 'bold' },
         tickangle: -40
       },
@@ -91,7 +92,8 @@ window.addEventListener("load", () => {
     if (!dataObj) return;
     const entries = Object.entries(dataObj); // [key, value]
   entries.forEach(([key, val]) => {
-      const label = val.tiempo || key.slice(-5); // fallback
+      // Usar 'hora' principal; fallback a 'tiempo' para datos antiguos y finalmente a parte del key
+      const label = val.hora || val.tiempo || key.slice(-5);
       sPM1.addPoint(key, label, val.pm1p0 ?? 0);
       sPM25.addPoint(key, label, val.pm2p5 ?? 0);
       sPM40.addPoint(key, label, val.pm4p0 ?? 0);
@@ -104,7 +106,7 @@ window.addEventListener("load", () => {
   db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap => {
     const key = snap.key;
     const val = snap.val();
-    const label = val.tiempo || key.slice(-5);
+    const label = val.hora || val.tiempo || key.slice(-5);
     sPM1.addPoint(key, label, val.pm1p0 ?? 0);
     sPM25.addPoint(key, label, val.pm2p5 ?? 0);
     sPM40.addPoint(key, label, val.pm4p0 ?? 0);
