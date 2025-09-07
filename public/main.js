@@ -73,31 +73,8 @@ function renderUltimaMedicion(data) {
   const dataTable = document.getElementById("data-table");
   const timeInfo = document.getElementById("time-info");
   const IDBCursor = document.getElementById("ID");
-
-  // Lista de campos de medición que (según tu descripción) sólo se envían la primera vez
-  const camposMediciones = [
-    'pm1p0','pm2p5','pm4p0','pm10p0','voc','nox','co2','cTe','cHu'
-  ];
-
-  // Guardar los valores originales la primera vez
-  if (!renderUltimaMedicion.baseMediciones) {
-    renderUltimaMedicion.baseMediciones = {};
-    camposMediciones.forEach(k => {
-      renderUltimaMedicion.baseMediciones[k] = (data[k] !== undefined && data[k] !== null) ? data[k] : '0';
-    });
-  } else {
-    // Si en algún momento SÍ llega un nuevo valor real, actualizar la base
-    camposMediciones.forEach(k => {
-      if (data[k] !== undefined && data[k] !== null && data[k] !== '') {
-        renderUltimaMedicion.baseMediciones[k] = data[k];
-      }
-    });
-  }
-
-  // Valor de hora más reciente
+  // Hora más reciente
   renderUltimaMedicion.ultimaHora = data.hora || renderUltimaMedicion.ultimaHora || '---';
-
-  const base = renderUltimaMedicion.baseMediciones;
 
   // Asegurar que encabezado exista (si alguien limpió la tabla)
   if (!dataTable.querySelector('th')) {
@@ -105,15 +82,15 @@ function renderUltimaMedicion(data) {
   }
   // Construir filas de datos (sin reponer encabezado)
   const rows = [
-    `<tr> <td>PM1.0</td> <td>${base.pm1p0}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM2.5</td> <td>${base.pm2p5}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM4.0</td> <td>${base.pm4p0}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>PM10.0</td> <td>${base.pm10p0}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>VOC</td> <td>${base.voc}</td> <td>Index</td> </tr>`,
-    `<tr> <td>NOx</td> <td>${base.nox}</td> <td>Index</td> </tr>`,
-    `<tr> <td>CO2</td> <td>${base.co2}</td> <td>ppm</td> </tr>`,
-    `<tr> <td>Temperatura</td> <td>${base.cTe}</td> <td>°C</td> </tr>`,
-    `<tr> <td>Humedad Relativa</td> <td>${base.cHu}</td> <td>%</td> </tr>`
+    `<tr> <td>PM1.0</td> <td>${data.pm1p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
+    `<tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>`,
+    `<tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>`,
+    `<tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>`,
+    `<tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>`,
+    `<tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>`
   ];
   // Reemplazar todo menos el encabezado
   const header = dataTable.querySelector('tr');
@@ -177,17 +154,16 @@ function descargarCSV() {
       "HoraMedicion": "hora"
     };
 
-    function parseTiempo(tiempoStr) {
-      if (!tiempoStr || typeof tiempoStr !== 'string') return 0;
-      const [h, m, s] = tiempoStr.split(':').map(Number);
+    function parseHora(horaStr) {
+      if (!horaStr || typeof horaStr !== 'string') return 0;
+      const [h, m, s] = horaStr.split(':').map(Number);
       return (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
     }
-
-    const sortedData = Object.values(data).sort((a, b) => parseTiempo(a.tiempo) - parseTiempo(b.tiempo));
-    const seenTiempos = new Set();
+    const sortedData = Object.values(data).sort((a, b) => parseHora(a.hora) - parseHora(b.hora));
+    const seenHoras = new Set();
     const uniqueEntries = sortedData.filter(entry => {
-      if (!entry.tiempo || seenTiempos.has(entry.tiempo)) return false;
-      seenTiempos.add(entry.tiempo);
+      if (!entry.hora || seenHoras.has(entry.hora)) return false;
+      seenHoras.add(entry.hora);
       return true;
     });
 
