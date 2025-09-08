@@ -24,7 +24,20 @@ window.addEventListener('load', () => {
 
   const db=firebase.database();
   const base=db.ref('/historial_mediciones').orderByKey().limitToLast(MAX_POINTS);
-  base.once('value',snap=>{ const obj=snap.val(); if(!obj)return; Object.entries(obj).forEach(([k,v])=>{ const label=v.hora||v.tiempo||k.slice(-5); sVOC.add(k,label,v.voc??0); sNOx.add(k,label,v.nox??0); }); });
+    base.once('value',snap=>{
+      const obj=snap.val();
+      if(!obj)return;
+      Object.entries(obj).forEach(([k,v])=>{
+        const label=v.hora||v.tiempo||k.slice(-5);
+        sVOC.add(k,label,v.voc??0);
+        sNOx.add(k,label,v.nox??0);
+      });
+      // Oculta el mensaje de 'Cargando datos...' al cargar datos
+      ['VOC','NOx'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.innerHTML='';
+      });
+    });
 
   db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sVOC.add(k,label,v.voc??0); sNOx.add(k,label,v.nox??0); });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,v.voc??0); sNOx.update(k,v.nox??0); });
