@@ -86,11 +86,11 @@ function renderUltimaMedicion(data) {
     `<tr> <td>PM2.5</td> <td>${data.pm2p5 ?? '0'}</td> <td>µg/m³</td> </tr>`,
     `<tr> <td>PM4.0</td> <td>${data.pm4p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
     `<tr> <td>PM10.0</td> <td>${data.pm10p0 ?? '0'}</td> <td>µg/m³</td> </tr>`,
-    `<tr> <td>VOC</td> <td>${data.voc ?? '0'}</td> <td>Index</td> </tr>`,
-    `<tr> <td>NOx</td> <td>${data.nox ?? '0'}</td> <td>Index</td> </tr>`,
+    `<tr> <td>VOC</td> <td>${Math.round(data.voc ?? 0)}</td> <td>Index</td> </tr>`,
+    `<tr> <td>NOx</td> <td>${Math.round(data.nox ?? 0)}</td> <td>Index</td> </tr>`,
     `<tr> <td>CO2</td> <td>${data.co2 ?? '0'}</td> <td>ppm</td> </tr>`,
     `<tr> <td>Temperatura</td> <td>${data.cTe ?? '0'}</td> <td>°C</td> </tr>`,
-    `<tr> <td>Humedad Relativa</td> <td>${data.cHu ?? '0'}</td> <td>%</td> </tr>`
+    `<tr> <td>Humedad Relativa</td> <td>${Math.round(data.cHu ?? 0)}</td> <td>%</td> </tr>`
   ];
   // Reemplazar todo menos el encabezado
   const header = dataTable.querySelector('tr');
@@ -185,7 +185,10 @@ function descargarCSV() {
         // Hora de inicio y ubicación se mantienen igual
         if (key === "HoraDeInicio") value = horaInicioGlobal ?? value;
         if (key === "ubicacion") value = ubicacionGlobal ?? value;
-
+        // Redondear VOC, NOx y Humedad Relativa
+        if (["voc","nox","HumedadRelativa"].includes(key)) {
+          value = Math.round(Number(value) || 0);
+        }
         if (
           value === undefined ||
           value === null ||

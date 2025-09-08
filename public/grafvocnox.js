@@ -43,8 +43,8 @@ window.addEventListener('load', () => {
       if(!obj)return;
       Object.entries(obj).forEach(([k,v])=>{
         const label=v.hora||v.tiempo||k.slice(-5);
-        sVOC.add(k,label,v.voc??0);
-        sNOx.add(k,label,v.nox??0);
+        sVOC.add(k,label,Math.round(v.voc??0));
+        sNOx.add(k,label,Math.round(v.nox??0));
       });
       // Elimina solo el div de carga
       ['VOC','NOx'].forEach(id=>{
@@ -53,6 +53,6 @@ window.addEventListener('load', () => {
       });
     });
 
-  db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sVOC.add(k,label,v.voc??0); sNOx.add(k,label,v.nox??0); });
-  db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,v.voc??0); sNOx.update(k,v.nox??0); });
+  db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sVOC.add(k,label,Math.round(v.voc??0)); sNOx.add(k,label,Math.round(v.nox??0)); });
+  db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,Math.round(v.voc??0)); sNOx.update(k,Math.round(v.nox??0)); });
 });

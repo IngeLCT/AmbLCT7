@@ -46,9 +46,9 @@ window.addEventListener('load', () => {
     if(!obj)return;
     Object.entries(obj).forEach(([k,v])=>{
       const label=v.hora||v.tiempo||k.slice(-5);
-      sCO2.add(k,label,v.co2??0);
-      sTEM.add(k,label,v.cTe??0);
-      sHUM.add(k,label,v.cHu??0);
+  sCO2.add(k,label,v.co2??0);
+  sTEM.add(k,label,v.cTe??0);
+  sHUM.add(k,label,Math.round(v.cHu??0));
     });
     // Elimina solo el div de carga
     ['CO2','TEM','HUM'].forEach(id=>{
@@ -57,6 +57,6 @@ window.addEventListener('load', () => {
     });
   });
 
-  db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sCO2.add(k,label,v.co2??0); sTEM.add(k,label,v.cTe??0); sHUM.add(k,label,v.cHu??0); });
-  db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,v.cHu??0); });
+  db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sCO2.add(k,label,v.co2??0); sTEM.add(k,label,v.cTe??0); sHUM.add(k,label,Math.round(v.cHu??0)); });
+  db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,Math.round(v.cHu??0)); });
 });
