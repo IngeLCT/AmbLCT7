@@ -129,7 +129,9 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
             },
             tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
             gridcolor: 'black',
-            linecolor: 'black'
+            linecolor: 'black',
+            autorange: true,
+            fixedrange: false
         },
         plot_bgcolor: "#cce5dc",
         paper_bgcolor: "#cce5dc",
@@ -259,39 +261,43 @@ let currentPage = 1;
 function updateDataTable(dataSlice, key) {
   if (!Array.isArray(dataSlice)) return;
 
-  const table = document.createElement('table');
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
-    ['#', 'HoraMedicion', key.toUpperCase()].forEach(text => {
-    const th = document.createElement('th');
-    th.textContent = text;
-    headerRow.appendChild(th);
-  });
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    ['#', 'HoraMedicion', 'FechaMedicion', key.toUpperCase()].forEach(text => {
+        const th = document.createElement('th');
+        th.textContent = text;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-  const tbody = document.createElement('tbody');
-  dataSlice.forEach((row, i) => {
-    const tr = document.createElement('tr');
+    const tbody = document.createElement('tbody');
+    dataSlice.forEach((row, i) => {
+        const tr = document.createElement('tr');
 
-    const tdIndex = document.createElement('td');
-    tdIndex.textContent = i;
-    tr.appendChild(tdIndex);
+        const tdIndex = document.createElement('td');
+        tdIndex.textContent = i;
+        tr.appendChild(tdIndex);
 
-    const tdTime = document.createElement('td');
-    tdTime.textContent = row.HoraMedicion || '-';
-    tr.appendChild(tdTime);
+        const tdTime = document.createElement('td');
+        tdTime.textContent = row.HoraMedicion || '-';
+        tr.appendChild(tdTime);
 
-    const tdValue = document.createElement('td');
-    tdValue.textContent = row[key] || '-';
-    tr.appendChild(tdValue);
+        const tdFecha = document.createElement('td');
+        tdFecha.textContent = row.fechaDeMedicion || '-';
+        tr.appendChild(tdFecha);
 
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody);
+        const tdValue = document.createElement('td');
+        tdValue.textContent = row[key] || '-';
+        tr.appendChild(tdValue);
 
-  dataTableContainer.innerHTML = '';
-  dataTableContainer.appendChild(table);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    dataTableContainer.innerHTML = '';
+    dataTableContainer.appendChild(table);
 }
 
 function updateChartInRange() {
