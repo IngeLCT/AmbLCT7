@@ -154,12 +154,25 @@ function descargarCSV() {
       "HoraMedicion": "hora"
     };
 
-    function parseHora(horaStr) {
-      if (!horaStr || typeof horaStr !== 'string') return 0;
-      const [h, m, s] = horaStr.split(':').map(Number);
-      return (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
+    function parseFechaHora(fechaStr, horaStr) {
+      // fechaStr: dd-mm-yy, horaStr: hh:mm:ss
+      if (!fechaStr || typeof fechaStr !== 'string') fechaStr = '00-00-00';
+      if (!horaStr || typeof horaStr !== 'string') horaStr = '00:00:00';
+      // Convertir fecha a formato YYYYMMDD
+      const [d, m, y] = fechaStr.split('-').map(Number);
+      // Asume años 2000+ (ajusta si tu formato cambia)
+      const fullYear = y < 100 ? 2000 + y : y;
+      // Convertir hora a segundos
+      const [h, min, s] = horaStr.split(':').map(Number);
+      return fullYear * 10000 + (m || 0) * 100 + (d || 0) + (h || 0) / 100 + (min || 0) / 10000 + (s || 0) / 1000000;
     }
-    const sortedData = Object.values(data).sort((a, b) => parseHora(a.hora) - parseHora(b.hora));
+    const sortedData = Object.values(data).sort((a, b) => {
+      const fa = a.fecha || '';
+      const fb = b.fecha || '';
+      const ha = a.hora || '';
+      const hb = b.hora || '';
+      return parseFechaHora(fa, ha) - parseFechaHora(fb, hb);
+    });
     const seenHoras = new Set();
     const uniqueEntries = sortedData.filter(entry => {
       if (!entry.hora || seenHoras.has(entry.hora)) return false;
