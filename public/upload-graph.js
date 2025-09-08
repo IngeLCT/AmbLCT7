@@ -82,20 +82,10 @@ function parseCsv(csvString) {
 function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
     chartContainer.innerHTML = '';
 
-    // Generar etiquetas X con el día cuando cambia
-    const customLabels = [];
-    let lastDate = null;
-    for (let i = 0; i < timeLabels.length; i++) {
-        const row = currentLoadedData[i];
-        const fecha = row?.fechaDeMedicion || '';
-        const hora = row?.HoraMedicion || '';
-        if (fecha !== lastDate) {
-            customLabels.push(`${fecha} ${hora}`);
-            lastDate = fecha;
-        } else {
-            customLabels.push(hora);
-        }
-    }
+    // Etiquetas X: siempre fecha + hora, sin agrupación
+    const start = parseInt(rangeInputs[0].value);
+    const end = parseInt(rangeInputs[1].value);
+    const customLabels = currentLoadedData.slice(start, end + 1).map(row => `${row.fechaDeMedicion || ''} ${row.HoraMedicion || ''}`);
     const trace = {
         x: customLabels,
         y: dataToChart,
