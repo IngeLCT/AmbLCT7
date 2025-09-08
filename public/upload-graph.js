@@ -118,9 +118,10 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
             tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
             gridcolor: 'black',
             linecolor: 'black',
+            autorange: true,
             tickangle: -45,
             nticks: 30,
-            // ...sin rangeselector ni rangeslider...
+            
         },
         yaxis: {
             title: {
