@@ -136,7 +136,7 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
         },
         plot_bgcolor: "#cce5dc",
         paper_bgcolor: "#cce5dc",
-        margin: { t: 50, l: 60, r: 40, b: 80 }
+        margin: { t: 50, l: 60, r: 40, b: 90 }
     };
 
     Plotly.newPlot(chartContainer, [trace], layout, {
@@ -210,12 +210,14 @@ const MaxVlaueBubbleStyle = () => {
   maxBubble.style.left = `${percent}%`;
 };
 const setMinValueOutput = () => {
-  minRange = parseInt(rangeInputs[0].value);
-    minBubble.innerHTML = currentLoadedData[minRange]?.HoraMedicion || '';
+    minRange = parseInt(rangeInputs[0].value);
+    const row = currentLoadedData[minRange];
+    minBubble.innerHTML = row ? `${row.fechaDeMedicion || ''} ${row.HoraMedicion || ''}` : '';
 };
 const setMaxValueOutput = () => {
-  maxRange = parseInt(rangeInputs[1].value);
-    maxBubble.innerHTML = currentLoadedData[maxRange]?.HoraMedicion || '';
+    maxRange = parseInt(rangeInputs[1].value);
+    const row = currentLoadedData[maxRange];
+    maxBubble.innerHTML = row ? `${row.fechaDeMedicion || ''} ${row.HoraMedicion || ''}` : '';
 };
 
 rangeInputs.forEach((input) => {
