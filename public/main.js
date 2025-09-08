@@ -166,25 +166,11 @@ function descargarCSV() {
       const [h, min, s] = horaStr.split(':').map(Number);
       return fullYear * 10000 + (m || 0) * 100 + (d || 0) + (h || 0) / 100 + (min || 0) / 10000 + (s || 0) / 1000000;
     }
-    const sortedData = Object.values(data).sort((a, b) => {
-      const fa = a.fecha || '';
-      const fb = b.fecha || '';
-      const ha = a.hora || '';
-      const hb = b.hora || '';
-      return parseFechaHora(fa, ha) - parseFechaHora(fb, hb);
-    });
-    const seenHoras = new Set();
-    const uniqueEntries = sortedData.filter(entry => {
-      if (!entry.hora || seenHoras.has(entry.hora)) return false;
-      seenHoras.add(entry.hora);
-      return true;
-    });
-
+    // Respeta el orden de inserción de Firebase
+    const entries = Object.values(data);
     let csv = headers.join(",") + "\n";
-
-    // Variables para mantener la última fecha encontrada
     let lastFecha = fechaInicioGlobal;
-    uniqueEntries.forEach(entry => {
+    entries.forEach(entry => {
       const row = headers.map(key => {
         const actualKey = keyMap[key];
         let value = entry[actualKey];
