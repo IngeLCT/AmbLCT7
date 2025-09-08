@@ -34,9 +34,7 @@ csvFileInput.addEventListener('change', () => {
                 return parts[0] * 3600 + parts[1] * 60 + (parts[2] || 0);
             };
 
-            currentLoadedData = parsedData.sort((a, b) => {
-                return parseTimeToSeconds(a.HoraMedicion) - parseTimeToSeconds(b.HoraMedicion);
-            });
+            currentLoadedData = parsedData; // Respeta el orden original del CSV
 
             if (currentLoadedData.length === 0) {
                 statusMessage.textContent = 'El archivo CSV está vacío o no contiene datos válidos.';
