@@ -98,11 +98,9 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
     const trace = {
         x: customLabels,
         y: dataToChart,
-        type: 'scatter', // Cambia a scatter para time series
-        mode: 'lines+markers',
+        type: 'bar', // Cambia a barras
         name: dataLabel,
-        marker: { color: '#000066' },
-        line: { color: '#000066' }
+        marker: { color: '#000066' }
     };
 
     const layout = {
@@ -120,7 +118,8 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
             tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
             gridcolor: 'black',
             linecolor: 'black',
-            tickangle: -45
+            tickangle: -45,
+            nticks: 30 // Aumenta el número de ticks
         },
         yaxis: {
             title: {
