@@ -135,7 +135,7 @@ function descargarCSV() {
     const headers = [
       "pm1.0", "pm2.5", "pm4.0", "pm10.0",
       "voc", "nox", "co2", "Temperatura", "HumedadRelativa",
-      "fechaDeInicio", "HoraDeInicio", "ubicacion", "HoraMedicion"
+      "fechaDeMedicion", "HoraDeInicio", "ubicacion", "HoraMedicion"
     ];
 
     const keyMap = {
@@ -148,7 +148,7 @@ function descargarCSV() {
       "co2": "co2",
       "Temperatura": "cTe",
       "HumedadRelativa": "cHu",
-      "fechaDeInicio": "fecha",
+      "fechaDeMedicion": "fecha",
       "HoraDeInicio": "inicio",
       "ubicacion": "ciudad",
       "HoraMedicion": "hora"
@@ -169,13 +169,21 @@ function descargarCSV() {
 
     let csv = headers.join(",") + "\n";
 
+    // Variables para mantener la última fecha encontrada
+    let lastFecha = fechaInicioGlobal;
     uniqueEntries.forEach(entry => {
       const row = headers.map(key => {
         const actualKey = keyMap[key];
         let value = entry[actualKey];
 
-        // Forzar los datos iniciales desde el primer registro
-        if (key === "fechaDeInicio") value = fechaInicioGlobal ?? value;
+        // Para la fecha, actualiza solo si existe una nueva
+        if (key === "fechaDeInicio") {
+          if (value && value !== "" && value !== undefined && value !== null && String(value).toLowerCase() !== "nan") {
+            lastFecha = value;
+          }
+          value = lastFecha ?? "0";
+        }
+        // Hora de inicio y ubicación se mantienen igual
         if (key === "HoraDeInicio") value = horaInicioGlobal ?? value;
         if (key === "ubicacion") value = ubicacionGlobal ?? value;
 
