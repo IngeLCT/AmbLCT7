@@ -120,14 +120,7 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
             linecolor: 'black',
             tickangle: -45,
             nticks: 30,
-            rangeselector: {
-                buttons: [
-                    { count: 1, label: '1d', step: 'day', stepmode: 'backward' },
-                    { count: 7, label: '1w', step: 'day', stepmode: 'backward' },
-                    { step: 'all' }
-                ]
-            },
-            rangeslider: { visible: true }
+            // ...sin rangeselector ni rangeslider...
         },
         yaxis: {
             title: {
