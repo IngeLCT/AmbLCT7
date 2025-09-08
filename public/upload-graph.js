@@ -82,16 +82,27 @@ function parseCsv(csvString) {
 function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
     chartContainer.innerHTML = '';
 
-    // Etiquetas X: siempre fecha + hora, sin agrupación
+    // Etiquetas X: formato ISO para time series
     const start = parseInt(rangeInputs[0].value);
     const end = parseInt(rangeInputs[1].value);
-    const customLabels = currentLoadedData.slice(start, end + 1).map(row => `${row.fechaDeMedicion || ''} ${row.HoraMedicion || ''}`);
+    const customLabels = currentLoadedData.slice(start, end + 1).map(row => {
+        // Convertir fechaDeMedicion de DD-MM-YY a YYYY-MM-DD
+        let fecha = row.fechaDeMedicion || '';
+        let hora = row.HoraMedicion || '';
+        let partes = fecha.split('-');
+        // Asume que YY es 2 dígitos y corresponde a 20YY
+        let yyyy = partes[2].length === 2 ? '20' + partes[2] : partes[2];
+        let isoDate = `${yyyy}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+        return `${isoDate} ${hora}`;
+    });
     const trace = {
         x: customLabels,
         y: dataToChart,
-        type: 'bar',
+        type: 'scatter', // Cambia a scatter para time series
+        mode: 'lines+markers',
         name: dataLabel,
-        marker: { color: '#000066' }
+        marker: { color: '#000066' },
+        line: { color: '#000066' }
     };
 
     const layout = {
@@ -101,10 +112,11 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
         },
         xaxis: {
             title: {
-                text: 'Hora de Medición (con día)',
+                text: 'Fecha y Hora de Medición',
                 font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
                 standoff: 20
             },
+            type: 'date',
             tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
             gridcolor: 'black',
             linecolor: 'black',
