@@ -1,7 +1,21 @@
 // grafamb.js
 window.addEventListener('load', () => {
   const MAX_POINTS = 15;
-  ['CO2','TEM','HUM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<div style="padding:22px;font-size:18px;font-weight:bold;color:#154360;text-align:center">Cargando datos...</div>'; });
+  // Agrega el mensaje de carga como un div hijo
+  ['CO2','TEM','HUM'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'loading-' + id;
+      loadingDiv.style.padding = '22px';
+      loadingDiv.style.fontSize = '18px';
+      loadingDiv.style.fontWeight = 'bold';
+      loadingDiv.style.color = '#154360';
+      loadingDiv.style.textAlign = 'center';
+      loadingDiv.textContent = 'Cargando datos...';
+      el.appendChild(loadingDiv);
+    }
+  });
 
   function initBar(divId, label, color, yMin, yMax){
     Plotly.newPlot(divId,[{x:[],y:[],type:'bar',name:label,marker:{color}}],{
@@ -27,7 +41,21 @@ window.addEventListener('load', () => {
 
   const db=firebase.database();
   const base=db.ref('/historial_mediciones').orderByKey().limitToLast(MAX_POINTS);
-  base.once('value',snap=>{ const obj=snap.val(); if(!obj)return; Object.entries(obj).forEach(([k,v])=>{ const label=v.hora||v.tiempo||k.slice(-5); sCO2.add(k,label,v.co2??0); sTEM.add(k,label,v.cTe??0); sHUM.add(k,label,v.cHu??0); }); });
+  base.once('value',snap=>{
+    const obj=snap.val();
+    if(!obj)return;
+    Object.entries(obj).forEach(([k,v])=>{
+      const label=v.hora||v.tiempo||k.slice(-5);
+      sCO2.add(k,label,v.co2??0);
+      sTEM.add(k,label,v.cTe??0);
+      sHUM.add(k,label,v.cHu??0);
+    });
+    // Elimina solo el div de carga
+    ['CO2','TEM','HUM'].forEach(id=>{
+      const loadingDiv = document.getElementById('loading-' + id);
+      if(loadingDiv) loadingDiv.remove();
+    });
+  });
 
   db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{ const k=snap.key,v=snap.val(),label=v.hora||v.tiempo||k.slice(-5); sCO2.add(k,label,v.co2??0); sTEM.add(k,label,v.cTe??0); sHUM.add(k,label,v.cHu??0); });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,v.cHu??0); });

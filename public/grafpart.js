@@ -8,7 +8,10 @@ window.addEventListener("load", () => {
   let firstData = false;
   function removeLoading(){
     if(firstData) return; firstData = true;
-    document.querySelectorAll('.loading-msg').forEach(n=>n.remove());
+    // Elimina solo los divs de mensaje de carga, nunca la gráfica
+    document.querySelectorAll('.loading-msg').forEach(n=>{
+      if(n.parentNode) n.parentNode.removeChild(n);
+    });
   }
   function addLoading(divId){
     const el = document.getElementById(divId);
@@ -91,7 +94,7 @@ window.addEventListener("load", () => {
     const dataObj = snap.val();
     if (!dataObj) return;
     const entries = Object.entries(dataObj); // [key, value]
-  entries.forEach(([key, val]) => {
+    entries.forEach(([key, val]) => {
       // Usar 'hora' principal; fallback a 'tiempo' para datos antiguos y finalmente a parte del key
       const label = val.hora || val.tiempo || key.slice(-5);
       sPM1.addPoint(key, label, val.pm1p0 ?? 0);
@@ -99,7 +102,7 @@ window.addEventListener("load", () => {
       sPM40.addPoint(key, label, val.pm4p0 ?? 0);
       sPM10.addPoint(key, label, val.pm10p0 ?? 0);
     });
-  removeLoading();
+    removeLoading();
   });
 
   // Escuchar nuevos (después de los ya cargados)
