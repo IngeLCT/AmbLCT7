@@ -1,7 +1,21 @@
 // gravocnox.js
 window.addEventListener('load', () => {
   const MAX_POINTS = 15;
-  ['VOC','NOx'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<div style="padding:22px;font-size:18px;font-weight:bold;color:#154360;text-align:center">Cargando datos...</div>'; });
+  // Agrega el mensaje de carga como un div hijo
+  ['VOC','NOx'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'loading-' + id;
+      loadingDiv.style.padding = '22px';
+      loadingDiv.style.fontSize = '18px';
+      loadingDiv.style.fontWeight = 'bold';
+      loadingDiv.style.color = '#154360';
+      loadingDiv.style.textAlign = 'center';
+      loadingDiv.textContent = 'Cargando datos...';
+      el.appendChild(loadingDiv);
+    }
+  });
 
   function initBar(divId, label, color, yMin, yMax) {
     Plotly.newPlot(divId, [{ x: [], y: [], type: 'bar', name: label, marker: { color } }], {
@@ -32,10 +46,10 @@ window.addEventListener('load', () => {
         sVOC.add(k,label,v.voc??0);
         sNOx.add(k,label,v.nox??0);
       });
-      // Oculta el mensaje de 'Cargando datos...' al cargar datos
+      // Elimina solo el div de carga
       ['VOC','NOx'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.innerHTML='';
+        const loadingDiv = document.getElementById('loading-' + id);
+        if(loadingDiv) loadingDiv.remove();
       });
     });
 
