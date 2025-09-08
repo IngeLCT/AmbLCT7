@@ -177,7 +177,7 @@ function descargarCSV() {
         let value = entry[actualKey];
 
         // Para la fecha, actualiza solo si existe una nueva
-        if (key === "fechaDeInicio") {
+        if (key === "fechaDeMedicion") {
           if (value && value !== "" && value !== undefined && value !== null && String(value).toLowerCase() !== "nan") {
             lastFecha = value;
           }
