@@ -18,7 +18,7 @@ window.addEventListener('load', () => {
   Series.prototype.update=function(key,val){ const i=this.keys.indexOf(key); if(i===-1)return; this.y[i]=val; Plotly.restyle(this.divId,{y:[this.y]}); };
 
   initBar('VOC','VOC index','#ff8000',0,500);
-  initBar('NOx','NOx index','#ff0040',0,200);
+  initBar('NOx','NOx index','#ff0040',0,100);
   const sVOC=new Series('VOC');
   const sNOx=new Series('NOx');
 
