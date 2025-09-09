@@ -10,7 +10,7 @@ window.addEventListener("load", () => {
     if(firstData) return; firstData = true;
     // Elimina solo los divs de mensaje de carga, nunca la gráfica
     document.querySelectorAll('.loading-msg').forEach(n=>{
-      if(n.parentNode) n.parentNode.removeChild(n);
+      const p=n.parentNode; if(n.parentNode) n.parentNode.removeChild(n); if(p) p.style.paddingTop='';
     });
   }
   function addLoading(divId){
@@ -19,6 +19,7 @@ window.addEventListener("load", () => {
     el.style.position = 'relative';
     if(!el.querySelector('.'+loadingClass)){
       el.insertAdjacentHTML('afterbegin', '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:28px;font-weight:bold;color:#000;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>');
+      el.style.paddingTop = '36px';
     }
   }
 

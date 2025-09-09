@@ -11,6 +11,8 @@ window.addEventListener('load', () => {
       el.insertAdjacentHTML('afterbegin',
         '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:28px;font-weight:bold;color:#000;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>'
       );
+  // reservar espacio para que no se sobreponga con el título de la gráfica
+  el.style.paddingTop = '36px';
     }
   });
 
@@ -137,8 +139,12 @@ window.addEventListener('load', () => {
       sTEM.add(k,label,v.cTe??0);
       sHUM.add(k,label,Math.round(v.cHu??0));
     });
-  // Elimina solo los mensajes de carga
-  document.querySelectorAll('.'+loadingClass).forEach(n=>n.remove());
+    // Elimina solo los mensajes de carga y restaura padding
+    document.querySelectorAll('.'+loadingClass).forEach(n=>{
+      const parent = n.parentElement;
+      n.remove();
+      if(parent) parent.style.paddingTop = '';
+    });
   });
 
   db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{
