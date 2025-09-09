@@ -1,19 +1,16 @@
 // grafamb.js
 window.addEventListener('load', () => {
   const MAX_POINTS = 24;
-  // Agrega el mensaje de carga como un div hijo
+  // Mensaje de carga: arriba, estilo unificado
+  const loadingClass = 'loading-msg';
   ['CO2','TEM','HUM'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) {
-      const loadingDiv = document.createElement('div');
-      loadingDiv.id = 'loading-' + id;
-      loadingDiv.style.padding = '22px';
-      loadingDiv.style.fontSize = '18px';
-      loadingDiv.style.fontWeight = 'bold';
-      loadingDiv.style.color = '#154360';
-      loadingDiv.style.textAlign = 'center';
-      loadingDiv.textContent = 'Cargando datos...';
-      el.appendChild(loadingDiv);
+    if(!el) return;
+    el.style.position='relative';
+    if(!el.querySelector('.'+loadingClass)){
+      el.insertAdjacentHTML('afterbegin',
+        '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:20px;font-weight:bold;color:#000;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>'
+      );
     }
   });
 
@@ -140,11 +137,8 @@ window.addEventListener('load', () => {
       sTEM.add(k,label,v.cTe??0);
       sHUM.add(k,label,Math.round(v.cHu??0));
     });
-    // Elimina solo el div de carga
-    ['CO2','TEM','HUM'].forEach(id=>{
-      const loadingDiv = document.getElementById('loading-' + id);
-      if(loadingDiv) loadingDiv.remove();
-    });
+  // Elimina solo los mensajes de carga
+  document.querySelectorAll('.'+loadingClass).forEach(n=>n.remove());
   });
 
   db.ref('/historial_mediciones').limitToLast(1).on('child_added', snap=>{
