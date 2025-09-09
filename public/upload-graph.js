@@ -85,8 +85,8 @@ function getBarColor(dataLabel) {
     // PM10.0 debe ir antes que PM1.0 para evitar coincidencias
     if (label.includes('pm10')) return '#bf00ff'; // PM10.0
     if (label.includes('pm1.0') || label.includes('pm1p0')) return 'red'; // PM1.0
-    if (label.includes('pm2.5') || label.includes('pm2_5')) return 'blue'; // PM2.5
-    if (label.includes('pm4.0') || label.includes('pm4_0')) return 'green'; // PM4.0
+    if (label.includes('pm2.5') || label.includes('pm2_5')) return '#ff9900'; // PM2.5 naranja
+    if (label.includes('pm4.0') || label.includes('pm4_0')) return '#00bfbf'; // PM4.0 turquesa
     if (label.includes('co2')) return '#990000'; // CO2
     if (label.includes('temperatura') || label.includes('temp') || label.includes('cte')) return '#006600'; // Temperatura
     if (label.includes('humedad') || label.includes('hum') || label.includes('chu')) return '#0000cc'; // Humedad

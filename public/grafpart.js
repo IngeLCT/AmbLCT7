@@ -129,8 +129,8 @@ window.addEventListener("load", () => {
 
   // Inicializar gráficas
   initBar("chartPM1", "PM1.0 µg/m³", "red", 0, 100);
-  initBar("chartPM2_5", "PM2.5 µg/m³", "blue", 0, 300);
-  initBar("chartPM4_0", "PM4.0 µg/m³", "green", 0, 500);
+  initBar("chartPM2_5", "PM2.5 µg/m³", "#ff9900", 0, 300); // naranja
+  initBar("chartPM4_0", "PM4.0 µg/m³", "#00bfbf", 0, 500); // turquesa
   initBar("chartPM10", "PM10.0 µg/m³", "#bf00ff", 0, 400);
 
   const sPM1 = new BarSeries('chartPM1');
