@@ -79,6 +79,22 @@ function parseCsv(csvString) {
     return data;
 }
 
+function getBarColor(dataLabel) {
+    // Asignar color según el tipo de medición, igual que en las gráficas individuales
+    const label = dataLabel.toLowerCase();
+    if (label.includes('pm1')) return 'red'; // PM1.0
+    if (label.includes('pm2.5') || label.includes('pm2_5')) return 'blue'; // PM2.5
+    if (label.includes('pm4.0') || label.includes('pm4_0')) return 'green'; // PM4.0
+    if (label.includes('pm10')) return '#bf00ff'; // PM10.0
+    if (label.includes('co2')) return '#990000'; // CO2
+    if (label.includes('temperatura') || label.includes('temp') || label.includes('cte')) return '#006600'; // Temperatura
+    if (label.includes('humedad') || label.includes('hum') || label.includes('chu')) return '#0000cc'; // Humedad
+    if (label.includes('voc')) return '#ff8000'; // VOC
+    if (label.includes('nox')) return '#ff0040'; // NOx
+    // Puedes agregar más reglas aquí si tienes más mediciones
+    return '#000066'; // color por defecto
+}
+
 function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
     chartContainer.innerHTML = '';
 
@@ -91,16 +107,16 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
         let hora = row.HoraMedicion || '';
         let partes = fecha.split('-');
         // Asume que YY es 2 dígitos y corresponde a 20YY
-        let yyyy = partes[2].length === 2 ? '20' + partes[2] : partes[2];
-        let isoDate = `${yyyy}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+        let yyyy = partes[2] && partes[2].length === 2 ? '20' + partes[2] : partes[2];
+        let isoDate = `${yyyy}-${partes[1]?.padStart(2, '0') || ''}-${partes[0]?.padStart(2, '0') || ''}`;
         return `${isoDate} ${hora}`;
     });
     const trace = {
         x: customLabels,
         y: dataToChart,
-        type: 'bar', // Cambia a barras
+        type: 'bar',
         name: dataLabel,
-        marker: { color: '#000066' }
+        marker: { color: getBarColor(dataLabel) }
     };
 
     const layout = {
@@ -121,7 +137,6 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
             autorange: true,
             tickangle: -45,
             nticks: 30,
-            
         },
         yaxis: {
             title: {
