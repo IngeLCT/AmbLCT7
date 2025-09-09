@@ -9,7 +9,7 @@ window.addEventListener('load', () => {
     el.style.position='relative';
     if(!el.querySelector('.'+loadingClass)){
       el.insertAdjacentHTML('afterbegin',
-        '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:20px;font-weight:bold;color:#000;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>'
+        '<div class="'+loadingClass+'" style="position:absolute;top:4px;left:0;width:100%;text-align:center;font-size:28px;font-weight:bold;color:#000;letter-spacing:.5px;pointer-events:none;">Cargando datos...</div>'
       );
     }
   });
