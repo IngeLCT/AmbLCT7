@@ -269,9 +269,10 @@ rangeInputs.forEach((input) => {
 
 const dataTableContainer = document.createElement('div');
 dataTableContainer.id = 'dataTable';
-dataTableContainer.style.margin = '20px auto';
+dataTableContainer.style.margin = '40px auto 20px auto'; // margen superior aumentado para separar de la gráfica
 dataTableContainer.style.maxWidth = '1200px';
 dataTableContainer.style.overflowX = 'auto';
+dataTableContainer.style.borderTop = 'none'; // asegurarse que no haya línea negra
 document.body.appendChild(dataTableContainer);
 
 const ROWS_PER_PAGE = 20;
