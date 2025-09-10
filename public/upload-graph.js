@@ -104,13 +104,13 @@ function createOrUpdatePlotly(dataToChart, dataLabel, timeLabels) {
     const end = parseInt(rangeInputs[1].value);
     const customLabels = currentLoadedData.slice(start, end + 1).map(row => {
         // Convertir fechaDeMedicion de DD-MM-YY a YYYY-MM-DD
-        let fecha = row.fechaDeMedicion || '';
-        let hora = row.HoraMedicion || '';
-        let partes = fecha.split('-');
-        // Asume que YY es 2 dígitos y corresponde a 20YY
-        let yyyy = partes[2] && partes[2].length === 2 ? '20' + partes[2] : partes[2];
-        let isoDate = `${yyyy}-${partes[1]?.padStart(2, '0') || ''}-${partes[0]?.padStart(2, '0') || ''}`;
-        return `${isoDate} ${hora}`;
+    let fecha = row.fechaDeMedicion || '';
+    let hora = row.HoraMedicion || '';
+    let partes = fecha.split('-');
+    // Ahora el año ya viene completo (YYYY)
+    let yyyy = partes[2];
+    let isoDate = `${yyyy}-${partes[1]?.padStart(2, '0') || ''}-${partes[0]?.padStart(2, '0') || ''}`;
+    return `${isoDate} ${hora}`;
     });
     const trace = {
         x: customLabels,

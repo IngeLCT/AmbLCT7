@@ -70,8 +70,7 @@ window.addEventListener('load', () => {
       const dd=String(d.getDate()).padStart(2,'0');
       return `${d.getFullYear()}-${mm}-${dd}`;
     }
-    const [dd,mm,yy] = fecha.split('-');
-    const yyyy = yy && yy.length===2 ? `20${yy}` : (yy||new Date().getFullYear());
+    const [dd,mm,yyyy] = fecha.split('-');
     return `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
   }
   function addDays(isoDate, days){ const d=new Date(isoDate+'T00:00:00'); d.setDate(d.getDate()+days); const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; }
