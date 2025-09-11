@@ -28,7 +28,7 @@ window.addEventListener('load', () => {
         text:label,
         font:{size:20,color:'black',family:'Arial',weight:'bold'}
       },
-      xaxis:{
+      xaxis: {
         title:{
           text:'Fecha y Hora de Medición',
           font:{size:16,color:'black',family:'Arial',weight:'bold'},
@@ -38,9 +38,8 @@ window.addEventListener('load', () => {
         tickfont:{color:'black',size:14,family:'Arial',weight:'bold'},
         gridcolor:'black',
         linecolor:'black',
-        autorange:true,
+        autorange: true,
         tickangle:-45,
-        nticks:30
       },
       yaxis:{
         title:{
@@ -50,9 +49,9 @@ window.addEventListener('load', () => {
         tickfont:{color:'black',size:14,family:'Arial',weight:'bold'},
         gridcolor:'black',
         linecolor:'black',
-        autorange:true,
+        autorange: false,
         fixedrange:false,
-        range:(yMin!==null&&yMax!==null)?[yMin,yMax]:undefined
+        range: (yMin!==null&&yMax!==null)?[yMin,yMax]:[0, 10]
       },
       plot_bgcolor:'#cce5dc',
       paper_bgcolor:'#cce5dc',
@@ -111,12 +110,38 @@ window.addEventListener('load', () => {
   function makeTimestampWithDate(isoDate, v){ const h = v.hora || v.tiempo || '00:00:00'; return `${isoDate} ${h}`; }
 
   function Series(divId){ this.divId=divId; this.x=[]; this.y=[]; this.keys=[]; }
-  Series.prototype.add=function(key,label,val){ if(this.keys.includes(key))return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){this.x.shift();this.y.shift();this.keys.shift();} Plotly.update(this.divId,{x:[this.x],y:[this.y]}); };
-  Series.prototype.update=function(key,val){ const i=this.keys.indexOf(key); if(i===-1)return; this.y[i]=val; Plotly.restyle(this.divId,{y:[this.y]}); };
+    function updateYAxisRange(divId, yValues){
+    const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
+    const maxVal = finite.length ? Math.max(...finite) : 0;
+    const upper = (maxVal > 0) ? (maxVal * 2) : 1;
+    Plotly.relayout(divId, { 'yaxis.autorange': false, 'yaxis.range': [0, upper] });
+  }
+  function updateXAxisTicks(divId, xValues){
+    const vals = Array.isArray(xValues) ? xValues : [];
+    const tickvals = vals;
+    const ticktext = [];
+    let prevDate = null;
+    for(let i=0; i<vals.length; i++){
+      const s = String(vals[i] ?? '');
+      const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
+      let datePart = '', timePart = '';
+      if(m){ datePart = m[1]; timePart = m[2]; }
+      else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
+      const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
+      const isFirst = (i === 0);
+      const dateChanged = datePart && prevDate && (datePart !== prevDate);
+      const showDate = isFirst || dateChanged;
+      const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
+      ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
+      if(datePart) prevDate = datePart;
+    }
+    Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
+  }\n  Series.prototype.add = function(key,label,val){ if(this.keys.includes(key)) return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){ this.x.shift(); this.y.shift(); this.keys.shift(); } Plotly.update(this.divId,{ x:[this.x], y:[this.y] }); updateXAxisTicks(this.divId, this.x); updateYAxisRange(this.divId, this.y); };
+  Series.prototype.update = function(key,val){ const i=this.keys.indexOf(key); if(i===-1) return; this.y[i]=val; Plotly.restyle(this.divId,{ y:[this.y] }); updateXAxisTicks(this.divId, this.x); updateYAxisRange(this.divId, this.y); };
 
-  initBar('CO2','CO2 ppm','#990000',300,1000);
-  initBar('TEM','Temperatura °C','#006600',20,50);
-  initBar('HUM','Humedad Relativa %','#0000cc',0,100);
+  initBar('CO2','CO2 ppm','#990000', null, null);
+  initBar('TEM','Temperatura °C','#006600', null, null);
+  initBar('HUM','Humedad Relativa %','#0000cc', null, null);
 
   const sCO2=new Series('CO2');
   const sTEM=new Series('TEM');
@@ -157,3 +182,5 @@ window.addEventListener('load', () => {
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,Math.round(v.cHu??0)); });
 });
+
+
