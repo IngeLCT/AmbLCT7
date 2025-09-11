@@ -119,11 +119,35 @@ window.addEventListener("load", () => {
       'yaxis.range': [0, upper]
     });
   }
-    function updateXAxisTicks(divId, xValues){
+      function updateXAxisTicks(divId, xValues){
     const vals = Array.isArray(xValues) ? xValues : [];
+    const tickvals = vals;
+    const ticktext = [];
+    let prevDate = null;
+    for(let i=0; i<vals.length; i++){
+      const s = String(vals[i] ?? '');
+      // Espera formato: YYYY-MM-DD HH:MM[:SS]
+      const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
+      let datePart = '', timePart = '';
+      if(m){
+        datePart = m[1];
+        timePart = m[2];
+      } else {
+        const parts = s.split(/\s+/);
+        datePart = parts[0] || '';
+        timePart = parts[1] || parts[0] || '';
+      }
+      const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
+      const isFirst = (i === 0);
+      const dateChanged = datePart && prevDate && (datePart !== prevDate);
+      const showDate = isFirst || dateChanged;
+      ticktext.push(showDate && datePart ? `${hhmm}<br>${datePart}` : hhmm);
+      if(datePart) prevDate = datePart;
+    }
     Plotly.relayout(divId, {
       'xaxis.tickmode': 'array',
-      'xaxis.tickvals': vals
+      'xaxis.tickvals': tickvals,
+      'xaxis.ticktext': ticktext
     });
   }
   BarSeries.prototype.addPoint = function(key, label, value) {
@@ -206,6 +230,10 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
+
+
+
+
 
 
 
