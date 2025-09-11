@@ -114,7 +114,8 @@ window.addEventListener('load', () => {
       if(datePart) prevDate = datePart;
     }
     Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
-  }\n  Series.prototype.add = function(key,label,val){ if(this.keys.includes(key)) return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){ this.x.shift(); this.y.shift(); this.keys.shift(); } Plotly.update(this.divId,{ x:[this.x], y:[this.y] }); updateXAxisTicks(this.divId, this.x); updateYAxisRange(this.divId, this.y); };
+  }
+  Series.prototype.add = function(key,label,val){ if(this.keys.includes(key)) return; this.keys.push(key); this.x.push(label); this.y.push(val); if(this.x.length>MAX_POINTS){ this.x.shift(); this.y.shift(); this.keys.shift(); } Plotly.update(this.divId,{ x:[this.x], y:[this.y] }); updateXAxisTicks(this.divId, this.x); updateYAxisRange(this.divId, this.y); };
   Series.prototype.update = function(key,val){ const i=this.keys.indexOf(key); if(i===-1) return; this.y[i]=val; Plotly.restyle(this.divId,{ y:[this.y] }); updateXAxisTicks(this.divId, this.x); updateYAxisRange(this.divId, this.y); };
 
   initBar('VOC','VOC index','#ff8000', null, null);
@@ -150,5 +151,6 @@ window.addEventListener('load', () => {
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,Math.round(v.voc??0)); sNOx.update(k,Math.round(v.nox??0)); });
 });
+
 
 
