@@ -119,6 +119,13 @@ window.addEventListener("load", () => {
       'yaxis.range': [0, upper]
     });
   }
+    function updateXAxisTicks(divId, xValues){
+    const vals = Array.isArray(xValues) ? xValues : [];
+    Plotly.relayout(divId, {
+      'xaxis.tickmode': 'array',
+      'xaxis.tickvals': vals
+    });
+  }
   BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // ya existe
     this.keys.push(key);
@@ -131,6 +138,7 @@ window.addEventListener("load", () => {
     }
     // Mantener layout y color originales sin resetear fondo
     Plotly.update(this.divId, { x: [this.x], y: [this.y] });
+    updateXAxisTicks(this.divId, this.x);
     updateYAxisRange(this.divId, this.y);
   };
   BarSeries.prototype.updatePoint = function(key, newValue) {
@@ -138,6 +146,7 @@ window.addEventListener("load", () => {
     if (idx === -1) return;
     this.y[idx] = newValue;
     Plotly.restyle(this.divId, { y: [this.y] });
+    updateXAxisTicks(this.divId, this.x);
     updateYAxisRange(this.divId, this.y);
   };
 
@@ -197,3 +206,6 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
+
+
+
