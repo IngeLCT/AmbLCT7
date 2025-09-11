@@ -47,7 +47,6 @@ window.addEventListener("load", () => {
         linecolor: 'black',
         autorange: true,
         tickangle: -45,
-        nticks: 30
       },
       yaxis: {
         title: {
@@ -57,9 +56,11 @@ window.addEventListener("load", () => {
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
         gridcolor: 'black',
         linecolor: 'black',
-        autorange: true,
+        // Forzar control manual del rango del eje Y
+        autorange: false,
         fixedrange: false,
-        range: (yMin !== null && yMax !== null) ? [yMin, yMax] : undefined
+        // Rango inicial por defecto (se actualizará dinámicamente con los datos)
+        range: (yMin !== null && yMax !== null) ? [yMin, yMax] : [0, 10]
       },
       plot_bgcolor: '#cce5dc',
       paper_bgcolor: '#cce5dc',
@@ -107,6 +108,17 @@ window.addEventListener("load", () => {
     this.y = [];
     this.keys = []; // claves firebase para child_changed
   }
+  function updateYAxisRange(divId, yValues){
+    // Calcular el máximo dentro de los últimos (hasta) 24 puntos y fijar el eje Y
+    const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
+    const maxVal = finite.length ? Math.max(...finite) : 0;
+    // Escala: doble del dato más grande; si no hay datos, usar 1 como mínimo visible
+    const upper = (maxVal > 0) ? (maxVal * 2) : 1;
+    Plotly.relayout(divId, {
+      'yaxis.autorange': false,
+      'yaxis.range': [0, upper]
+    });
+  }
   BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // ya existe
     this.keys.push(key);
@@ -119,19 +131,21 @@ window.addEventListener("load", () => {
     }
     // Mantener layout y color originales sin resetear fondo
     Plotly.update(this.divId, { x: [this.x], y: [this.y] });
+    updateYAxisRange(this.divId, this.y);
   };
   BarSeries.prototype.updatePoint = function(key, newValue) {
     const idx = this.keys.indexOf(key);
     if (idx === -1) return;
     this.y[idx] = newValue;
     Plotly.restyle(this.divId, { y: [this.y] });
+    updateYAxisRange(this.divId, this.y);
   };
 
-  // Inicializar gráficas
-  initBar("chartPM1", "PM1.0 µg/m³", "red", 0, 100);
-  initBar("chartPM2_5", "PM2.5 µg/m³", "#bfa600", 0, 300); // amarillo oscuro
-  initBar("chartPM4_0", "PM4.0 µg/m³", "#00bfbf", 0, 500); // turquesa
-  initBar("chartPM10", "PM10.0 µg/m³", "#bf00ff", 0, 400);
+  // Inicializar gráficas (sin rango fijo; se ajusta dinámicamente)
+  initBar("chartPM1", "PM1.0 µg/m³", "red", null, null);
+  initBar("chartPM2_5", "PM2.5 µg/m³", "#bfa600", null, null); // amarillo oscuro
+  initBar("chartPM4_0", "PM4.0 µg/m³", "#00bfbf", null, null); // turquesa
+  initBar("chartPM10", "PM10.0 µg/m³", "#bf00ff", null, null);
 
   const sPM1 = new BarSeries('chartPM1');
   const sPM25 = new BarSeries('chartPM2_5');
