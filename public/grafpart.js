@@ -141,7 +141,8 @@ window.addEventListener("load", () => {
       const isFirst = (i === 0);
       const dateChanged = datePart && prevDate && (datePart !== prevDate);
       const showDate = isFirst || dateChanged;
-      ticktext.push(showDate && datePart ? `${hhmm}<br>${datePart}` : hhmm);
+      const dispDate = datePart ? (datePart.split('-').slice(0,3).reverse().join('-')) : '';
+      ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
       if(datePart) prevDate = datePart;
     }
     Plotly.relayout(divId, {
@@ -230,6 +231,7 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
+
 
 
 
