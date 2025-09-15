@@ -126,7 +126,7 @@ window.addEventListener('load', () => {
     const tickvals = Array.isArray(xVals) ? xVals : [];
     const vals = Array.isArray(labels) ? labels : [];
     const ticktext = [];
-    let prevDate = null;
+    let prevDate = null;`n    let seen = false;
     for(let i=0; i<vals.length; i++){
       const s = String(vals[i] ?? '');
       const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
@@ -134,12 +134,12 @@ window.addEventListener('load', () => {
       if(m){ datePart = m[1]; timePart = m[2]; }
       else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
       const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
-      const isFirst = (i === 0);
+      const isFirstNonEmpty = (!seen && !!datePart);
       const dateChanged = datePart && prevDate && (datePart !== prevDate);
-      const showDate = isFirst || dateChanged;
+      const showDate = isFirstNonEmpty || dateChanged;
       const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
       ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
-      if(datePart) prevDate = datePart;
+      if(datePart){ if(!seen) seen = true; prevDate = datePart; }
     }
     Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
   }
@@ -203,6 +203,7 @@ Series.prototype.add = function(key,label,val){
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,Math.round(v.cHu??0)); });
 });
+
 
 
 
