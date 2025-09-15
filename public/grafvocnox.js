@@ -37,7 +37,7 @@ window.addEventListener('load', () => {
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
         gridcolor: 'black',
         linecolor: 'black',
-        autorange: false,
+        autorange: true,
         tickangle: -45,
       },
       yaxis: {
@@ -48,7 +48,7 @@ window.addEventListener('load', () => {
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
         gridcolor: 'black',
         linecolor: 'black',
-        autorange: false,
+        autorange: true,
         fixedrange: false,
         range: (yMin!==null&&yMax!==null)?[yMin,yMax]:[0, 10]
       },
@@ -100,27 +100,14 @@ window.addEventListener('load', () => {
     const upper = (maxVal > 0) ? (maxVal * 2) : 1;
     Plotly.relayout(divId, { 'yaxis.autorange': false, 'yaxis.range': [0, upper] });
   }
-    function updateXAxisTicks(divId, xVals, labels){
+      function updateXAxisTicks(divId, xVals, labels){
     const tickvals = Array.isArray(xVals) ? xVals : [];
     const vals = Array.isArray(labels) ? labels : [];
     const ticktext = [];
     let prevDate = null;
-    for(let i=0;i<vals.length;i++){
+    for(let i=0; i<vals.length; i++){
       const s = String(vals[i] ?? '');
       const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
-      let datePart = '', timePart = '';
-      if(m){ datePart = m[1]; timePart = m[2]; }
-      else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
-      const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
-      const isFirst = (i === 0);
-      const dateChanged = datePart && prevDate && (datePart !== prevDate);
-      const showDate = isFirst || dateChanged;
-      const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
-      ticktext.push(showDate && datePart ? ${hhmm}<br> : hhmm);
-      if(datePart) prevDate = datePart;
-    }
-    Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
-  }-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
       let datePart = '', timePart = '';
       if(m){ datePart = m[1]; timePart = m[2]; }
       else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
@@ -134,7 +121,7 @@ window.addEventListener('load', () => {
     }
     Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
   }
-    Series.prototype.add = function(key,label,val){
+Series.prototype.add = function(key,label,val){
     if(this.keys.includes(key)) return; 
     this.y.shift(); this.y.push(val);
     this.lbl.shift(); this.lbl.push(label);
@@ -184,6 +171,8 @@ window.addEventListener('load', () => {
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,Math.round(v.voc??0)); sNOx.update(k,Math.round(v.nox??0)); });
 });
+
+
 
 
 
