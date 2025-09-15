@@ -122,11 +122,12 @@ window.addEventListener('load', () => {
     const upper = (maxVal > 0) ? (maxVal * 2) : 1;
     Plotly.relayout(divId, { 'yaxis.autorange': false, 'yaxis.range': [0, upper] });
   }
-      function updateXAxisTicks(divId, xVals, labels){
+        function updateXAxisTicks(divId, xVals, labels){
     const tickvals = Array.isArray(xVals) ? xVals : [];
     const vals = Array.isArray(labels) ? labels : [];
     const ticktext = [];
-    let prevDate = null;`n    let seen = false;
+    let prevDate = null;
+    let seen = false;
     for(let i=0; i<vals.length; i++){
       const s = String(vals[i] ?? '');
       const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
@@ -142,8 +143,7 @@ window.addEventListener('load', () => {
       if(datePart){ if(!seen) seen = true; prevDate = datePart; }
     }
     Plotly.relayout(divId, { 'xaxis.tickmode': 'array', 'xaxis.tickvals': tickvals, 'xaxis.ticktext': ticktext });
-  }
-Series.prototype.add = function(key,label,val){
+  }Series.prototype.add = function(key,label,val){
     if(this.keys.includes(key)) return; 
     this.y.shift(); this.y.push(val);
     this.lbl.shift(); this.lbl.push(label);
@@ -203,6 +203,7 @@ Series.prototype.add = function(key,label,val){
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,Math.round(v.cHu??0)); });
 });
+
 
 
 
