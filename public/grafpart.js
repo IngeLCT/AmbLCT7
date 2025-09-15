@@ -25,8 +25,8 @@ window.addEventListener("load", () => {
 
   function initBar(divId, label, color, yMin, yMax) {
     Plotly.newPlot(divId, [{
-      x: [],
-      y: [],
+      x: Array.from({ length: MAX_POINTS }, (_, i) => i),
+      y: new Array(MAX_POINTS).fill(null),
       type: 'bar',
       name: label,
       marker: { color }
@@ -41,7 +41,7 @@ window.addEventListener("load", () => {
           font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
           standoff: 20
         },
-        type: 'date',
+        type: 'category',
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
         gridcolor: 'black',
         linecolor: 'black',
@@ -102,13 +102,13 @@ window.addEventListener("load", () => {
     return `${isoDate} ${h}`;
   }
 
-  function BarSeries(divId) {
+    function BarSeries(divId) {
     this.divId = divId;
-    this.x = [];
-    this.y = [];
-    this.keys = []; // claves firebase para child_changed
-  }
-  function updateYAxisRange(divId, yValues){
+    this.slotIdx = Array.from({ length: MAX_POINTS }, (_, i) => i);
+    this.lbl = new Array(MAX_POINTS).fill('');
+    this.y = new Array(MAX_POINTS).fill(null);
+    this.keys = new Array(MAX_POINTS).fill(null);
+  }\n  function updateYAxisRange(divId, yValues){
     // Calcular el máximo dentro de los últimos (hasta) 24 puntos y fijar el eje Y
     const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
     const maxVal = finite.length ? Math.max(...finite) : 0;
@@ -119,29 +119,22 @@ window.addEventListener("load", () => {
       'yaxis.range': [0, upper]
     });
   }
-      function updateXAxisTicks(divId, xValues){
-    const vals = Array.isArray(xValues) ? xValues : [];
-    const tickvals = vals;
+        function updateXAxisTicks(divId, xVals, labels){
+    const tickvals = Array.isArray(xVals) ? xVals : [];
+    const vals = Array.isArray(labels) ? labels : [];
     const ticktext = [];
     let prevDate = null;
     for(let i=0; i<vals.length; i++){
       const s = String(vals[i] ?? '');
-      // Espera formato: YYYY-MM-DD HH:MM[:SS]
       const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
       let datePart = '', timePart = '';
-      if(m){
-        datePart = m[1];
-        timePart = m[2];
-      } else {
-        const parts = s.split(/\s+/);
-        datePart = parts[0] || '';
-        timePart = parts[1] || parts[0] || '';
-      }
+      if(m){ datePart = m[1]; timePart = m[2]; }
+      else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
       const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
       const isFirst = (i === 0);
       const dateChanged = datePart && prevDate && (datePart !== prevDate);
       const showDate = isFirst || dateChanged;
-      const dispDate = datePart ? (datePart.split('-').slice(0,3).reverse().join('-')) : '';
+      const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
       ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
       if(datePart) prevDate = datePart;
     }
@@ -150,28 +143,20 @@ window.addEventListener("load", () => {
       'xaxis.tickvals': tickvals,
       'xaxis.ticktext': ticktext
     });
-  }
-  BarSeries.prototype.addPoint = function(key, label, value) {
+  }\n  BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // ya existe
-    this.keys.push(key);
-    this.x.push(label);
-    this.y.push(value);
-    if (this.x.length > MAX_POINTS) {
-      this.x.shift();
-      this.y.shift();
-      this.keys.shift();
-    }
-    // Mantener layout y color originales sin resetear fondo
-    Plotly.update(this.divId, { x: [this.x], y: [this.y] });
-    updateXAxisTicks(this.divId, this.x);
+    this.y.shift(); this.y.push(value);
+    this.lbl.shift(); this.lbl.push(label);
+    this.keys.shift(); this.keys.push(key);
+    Plotly.update(this.divId, { x: [this.slotIdx], y: [this.y] });
+    updateXAxisTicks(this.divId, this.slotIdx, this.lbl);
     updateYAxisRange(this.divId, this.y);
-  };
-  BarSeries.prototype.updatePoint = function(key, newValue) {
+  };  BarSeries.prototype.updatePoint = function(key, newValue) {
     const idx = this.keys.indexOf(key);
     if (idx === -1) return;
     this.y[idx] = newValue;
     Plotly.restyle(this.divId, { y: [this.y] });
-    updateXAxisTicks(this.divId, this.x);
+    updateXAxisTicks(this.divId, this.slotIdx, this.lbl);
     updateYAxisRange(this.divId, this.y);
   };
 
@@ -231,6 +216,10 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
+
+
+
+
 
 
 
