@@ -108,7 +108,8 @@ window.addEventListener("load", () => {
     this.lbl = new Array(MAX_POINTS).fill('');
     this.y = new Array(MAX_POINTS).fill(null);
     this.keys = new Array(MAX_POINTS).fill(null);
-  }\n  function updateYAxisRange(divId, yValues){
+  }
+  function updateYAxisRange(divId, yValues){
     // Calcular el máximo dentro de los últimos (hasta) 24 puntos y fijar el eje Y
     const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
     const maxVal = finite.length ? Math.max(...finite) : 0;
@@ -143,7 +144,8 @@ window.addEventListener("load", () => {
       'xaxis.tickvals': tickvals,
       'xaxis.ticktext': ticktext
     });
-  }\n  BarSeries.prototype.addPoint = function(key, label, value) {
+  }
+  BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // ya existe
     this.y.shift(); this.y.push(value);
     this.lbl.shift(); this.lbl.push(label);
@@ -151,7 +153,8 @@ window.addEventListener("load", () => {
     Plotly.update(this.divId, { x: [this.slotIdx], y: [this.y] });
     updateXAxisTicks(this.divId, this.slotIdx, this.lbl);
     updateYAxisRange(this.divId, this.y);
-  };  BarSeries.prototype.updatePoint = function(key, newValue) {
+  };
+  BarSeries.prototype.updatePoint = function(key, newValue) {
     const idx = this.keys.indexOf(key);
     if (idx === -1) return;
     this.y[idx] = newValue;
@@ -216,6 +219,7 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
+
 
 
 
