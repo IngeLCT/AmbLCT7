@@ -171,11 +171,3 @@ window.addEventListener('load', () => {
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sVOC.update(k,Math.round(v.voc??0)); sNOx.update(k,Math.round(v.nox??0)); });
 });
-
-
-
-
-
-
-
-

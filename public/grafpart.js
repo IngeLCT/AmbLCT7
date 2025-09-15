@@ -220,19 +220,3 @@ window.addEventListener("load", () => {
     sPM10.updatePoint(key, val.pm10p0 ?? 0);
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

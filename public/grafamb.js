@@ -203,11 +203,3 @@ window.addEventListener('load', () => {
   });
   db.ref('/historial_mediciones').limitToLast(1).on('child_changed', snap=>{ const k=snap.key,v=snap.val(); sCO2.update(k,v.co2??0); sTEM.update(k,v.cTe??0); sHUM.update(k,Math.round(v.cHu??0)); });
 });
-
-
-
-
-
-
-
-
