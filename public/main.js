@@ -75,8 +75,7 @@ function renderUltimaMedicion(data) {
   const IDBCursor = document.getElementById("ID");
   // Hora más reciente
   renderUltimaMedicion.ultimaHora = data.hora || renderUltimaMedicion.ultimaHora || '---';
-  
-  renderUltimaMedicion.ultimaFecha = data.fecha || renderUltimaMedicion.ultimaFecha || '---';
+  renderUltimaMedicion.ultimaFecha = (data.fecha && String(data.fecha).trim() !== '' && String(data.fecha).toLowerCase() !== 'nan') ? data.fecha : (renderUltimaMedicion.ultimaFecha || fechaInicioGlobal || '---');
 
   // Asegurar que encabezado exista (si alguien limpió la tabla)
   if (!dataTable.querySelector('th')) {
@@ -214,3 +213,4 @@ function descargarCSV() {
     URL.revokeObjectURL(url);
   });
 }
+
