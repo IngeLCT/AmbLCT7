@@ -75,6 +75,8 @@ function renderUltimaMedicion(data) {
   const IDBCursor = document.getElementById("ID");
   // Hora más reciente
   renderUltimaMedicion.ultimaHora = data.hora || renderUltimaMedicion.ultimaHora || '---';
+  
+  renderUltimaMedicion.ultimaFecha = data.fecha || renderUltimaMedicion.ultimaFecha || '---';
 
   // Asegurar que encabezado exista (si alguien limpió la tabla)
   if (!dataTable.querySelector('th')) {
@@ -97,12 +99,13 @@ function renderUltimaMedicion(data) {
   dataTable.innerHTML = header.outerHTML + rows.join('');
 
   // NO MODIFICAR
-  timeInfo.innerHTML = `
-    <strong>Fecha de inicio:</strong> ${fechaInicioGlobal ?? '---'} <br>
-    <strong>Hora de inicio:</strong> ${horaInicioGlobal ?? '---'}<br>
-    <strong>Ubicacion:</strong> ${ubicacionGlobal ?? '---'}<br>
-  <strong>Hora Ultima Medición:</strong> ${renderUltimaMedicion.ultimaHora}
-  `;
+  timeInfo.innerHTML = '' +
+    '<strong>Fecha de inicio:</strong> ' + (fechaInicioGlobal ?? '---') + ' <br>' +
+    '<strong>Hora de inicio:</strong> ' + (horaInicioGlobal ?? '---') + '<br>' +
+    '<strong>Ubicacion:</strong> ' + (ubicacionGlobal ?? '---') + '<br>' +
+    '<strong>Fecha Ultima Medición:</strong> ' + (renderUltimaMedicion.ultimaFecha) + '<br>' +
+    '<strong>Hora Ultima Medición:</strong> ' + (renderUltimaMedicion.ultimaHora);
+
 
   // NO MODIFICAR
   IDBCursor.innerHTML= `
