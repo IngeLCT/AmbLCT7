@@ -139,7 +139,7 @@ window.addEventListener('load', () => {
   };
 
   initBar('VOC','VOC index','#ff8000', null, null);
-  initBar('NOx','NOx index','#ff0040', null, null);
+  initBar('NOx','NOx index','#00ff00', null, null);
   const sVOC=new Series('VOC');
   const sNOx=new Series('NOx');
 
