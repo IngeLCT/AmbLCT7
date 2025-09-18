@@ -39,7 +39,7 @@ window.addEventListener("load", () => {
         title: {
           text: 'Fecha y Hora de Medición',
           font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
-          standoff: 60
+          standoff: 30
         },
         type: 'category',
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
