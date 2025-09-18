@@ -129,7 +129,7 @@ window.addEventListener("load", () => {
   }
 
   // 👇 flag global para activar/desactivar fechas en todos los ticks
-const DEBUG_SHOW_FULL_DATE = true; // poner en false para volver al modo normal
+const DEBUG_SHOW_FULL_DATE = false; // poner en false para volver al modo normal
 
 function updateXAxisTicks(divId, xVals, labels){
   const tickvals = Array.isArray(xVals) ? xVals : [];
