@@ -39,7 +39,7 @@ window.addEventListener("load", () => {
         title: {
           text: 'Fecha y Hora de Medición',
           font: { size: 16, color: 'black', family: 'Arial', weight: 'bold' },
-          standoff: 20
+          standoff: 60
         },
         type: 'category',
         tickfont: { color: 'black', size: 14, family: 'Arial', weight: 'bold' },
@@ -47,6 +47,8 @@ window.addEventListener("load", () => {
         linecolor: 'black',
         autorange: true,
         tickangle: -45,
+        ticklabelposition: 'outside', // explícito
+        automargin: true               // 👈 permite que el standoff surta efecto
       },
       yaxis: {
         title: {
@@ -64,7 +66,7 @@ window.addEventListener("load", () => {
       },
       plot_bgcolor: '#cce5dc',
       paper_bgcolor: '#cce5dc',
-      margin: { t: 50, l: 60, r: 40, b: 90 },
+      margin: { t: 50, l: 60, r: 40, b: 120 },
       bargap: 0.2
     }, {
       responsive: true,
@@ -82,7 +84,9 @@ window.addEventListener("load", () => {
     const [dd,mm,yyyy] = fecha.split('-');
     return `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
   }
+
   function addDays(isoDate, days){ const d=new Date(isoDate+'T00:00:00'); d.setDate(d.getDate()+days); const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; }
+  
   function inferDatesForEntries(entries){
     const n = entries.length; const dates = new Array(n).fill(null); const markers=[];
     for(let i=n-1;i>=0;i--){ const v=entries[i][1]; if(v && v.fecha){ markers.push(i);} }
@@ -95,7 +99,9 @@ window.addEventListener("load", () => {
     }
     return dates;
   }
+
   function makeTimestampWithDate(isoDate, v){ const h=v.hora||v.tiempo||'00:00:00'; return `${isoDate} ${h}`; }
+  
   function makeTimestamp(v){
     const isoDate = toIsoDate(v.fecha);
     const h = v.hora || v.tiempo || '00:00:00';
@@ -110,6 +116,7 @@ window.addEventListener("load", () => {
     this.keys= new Array(MAX_POINTS).fill(null);
     this.count = 0; // <<-- NUEVO: cuántos puntos válidos hay ya pintados (0..MAX_POINTS)
   }
+
   function updateYAxisRange(divId, yValues){
     // Calcular el máximo dentro de los últimos (hasta) 24 puntos y fijar el eje Y
     const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
@@ -121,7 +128,8 @@ window.addEventListener("load", () => {
       'yaxis.range': [0, upper]
     });
   }
-        function updateXAxisTicks(divId, xVals, labels){
+
+  function updateXAxisTicks(divId, xVals, labels){
     const tickvals = Array.isArray(xVals) ? xVals : [];
     const vals = Array.isArray(labels) ? labels : [];
     const ticktext = [];
