@@ -128,32 +128,52 @@ window.addEventListener("load", () => {
     });
   }
 
-  function updateXAxisTicks(divId, xVals, labels){
-    const tickvals = Array.isArray(xVals) ? xVals : [];
-    const vals = Array.isArray(labels) ? labels : [];
-    const ticktext = [];
-    let prevDate = null;
-    let seen = false;
-    for(let i=0; i<vals.length; i++){
-      const s = String(vals[i] ?? '');
-      const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
-      let datePart = '', timePart = '';
-      if(m){ datePart = m[1]; timePart = m[2]; }
-      else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
-      const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
+  // 👇 flag global para activar/desactivar fechas en todos los ticks
+const DEBUG_SHOW_FULL_DATE = true; // poner en false para volver al modo normal
+
+function updateXAxisTicks(divId, xVals, labels){
+  const tickvals = Array.isArray(xVals) ? xVals : [];
+  const vals = Array.isArray(labels) ? labels : [];
+  const ticktext = [];
+
+  let prevDate = null;
+  let seen = false;
+
+  for(let i=0; i<vals.length; i++){
+    const s = String(vals[i] ?? '');
+    const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
+    let datePart = '', timePart = '';
+    if(m){
+      datePart = m[1];
+      timePart = m[2];
+    } else {
+      const parts = s.split(/\s+/);
+      datePart = parts[0] || '';
+      timePart = parts[1] || parts[0] || '';
+    }
+    const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
+    const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
+
+    if (DEBUG_SHOW_FULL_DATE) {
+      // 👇 siempre mostrar fecha y hora (debug)
+      ticktext.push(`${hhmm}<br>${dispDate}`);
+    } else {
+      // 👇 comportamiento original
       const isFirstNonEmpty = (!seen && !!datePart);
       const dateChanged = datePart && prevDate && (datePart !== prevDate);
       const showDate = isFirstNonEmpty || dateChanged;
-      const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
       ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
-      if(datePart){ if(!seen) seen = true; prevDate = datePart; }
     }
-    Plotly.relayout(divId, {
-      'xaxis.tickmode': 'array',
-      'xaxis.tickvals': tickvals,
-      'xaxis.ticktext': ticktext
-    });
+
+    if(datePart){ if(!seen) seen = true; prevDate = datePart; }
   }
+
+  Plotly.relayout(divId, {
+    'xaxis.tickmode': 'array',
+    'xaxis.tickvals': tickvals,
+    'xaxis.ticktext': ticktext
+  });
+}
   BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // evitar duplicados
 
