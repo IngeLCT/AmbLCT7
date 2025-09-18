@@ -48,7 +48,7 @@ window.addEventListener("load", () => {
         autorange: true,
         tickangle: -45,
         // ticklabelposition: 'outside', // explícito
-        automargin: true               // 👈 permite que el standoff surta efecto
+        //automargin: true               // 👈 permite que el standoff surta efecto
       },
       yaxis: {
         title: {
@@ -66,7 +66,7 @@ window.addEventListener("load", () => {
       },
       plot_bgcolor: '#cce5dc',
       paper_bgcolor: '#cce5dc',
-      margin: { t: 50, l: 60, r: 40, b: 90 },
+      margin: { t: 50, l: 60, r: 40, b: 100 },
       bargap: 0.2
     }, {
       responsive: true,
