@@ -47,7 +47,7 @@ window.addEventListener("load", () => {
         linecolor: 'black',
         autorange: true,
         tickangle: -45,
-        ticklabelposition: 'outside', // explícito
+        // ticklabelposition: 'outside', // explícito
         automargin: true               // 👈 permite que el standoff surta efecto
       },
       yaxis: {
