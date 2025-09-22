@@ -142,9 +142,7 @@ function renderUltimaMedicion(data) {
   renderUltimaMedicion.ultimaHora =
     isValidStr(data.hora) ? data.hora : (renderUltimaMedicion.ultimaHora || '---');
 
-  const fCandidata = isValidStr(data.fecha) ? data.fecha
-                    : (renderUltimaMedicion.ultimaFecha || ultimaFechaGlobal || fechaInicioGlobal || '---');
-  renderUltimaMedicion.ultimaFecha = fCandidata;
+  renderUltimaMedicion.ultimaFecha = (data.fecha && String(data.fecha).trim() !== '' && String(data.fecha).toLowerCase() !== 'nan') ? data.fecha : (renderUltimaMedicion.ultimaFecha || ultimaFechaGlobal || fechaInicioGlobal || '---');
 
   // Encabezado asegurado
   if (!dataTable.querySelector('th')) {
