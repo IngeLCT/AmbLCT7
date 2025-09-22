@@ -128,6 +128,24 @@ function listenStaticFields() {
 }
 listenStaticFields();
 
+// Bootstrap: find the last known fecha among the latest records
+const ultFechaQuery = database.ref('/historial_mediciones').orderByKey().limitToLast(200);
+ultFechaQuery.once('value', snap => {
+  const obj = snap.val() || {};
+  const entries = Object.values(obj);
+  for(let i = entries.length - 1; i >= 0; i--){
+    const f = entries[i] && entries[i].fecha;
+    if (f && String(f).trim() !== '' && String(f).toLowerCase() !== 'nan'){
+      ultimaFechaGlobal = f;
+      if (!renderUltimaMedicion.ultimaFecha) renderUltimaMedicion.ultimaFecha = f;
+      break;
+
+
+
+    }
+  }
+});
+
 // ---- Render del último dato (solo tabla + última fecha/hora)
 function renderUltimaMedicion(data) {
   if (!data) return;
