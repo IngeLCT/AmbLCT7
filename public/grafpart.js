@@ -47,7 +47,6 @@ window.addEventListener("load", () => {
         linecolor: 'black',
         autorange: true,
         tickangle: -45,
-
       },
       yaxis: {
         title: {
@@ -83,9 +82,7 @@ window.addEventListener("load", () => {
     const [dd,mm,yyyy] = fecha.split('-');
     return `${yyyy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
   }
-
   function addDays(isoDate, days){ const d=new Date(isoDate+'T00:00:00'); d.setDate(d.getDate()+days); const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; }
-  
   function inferDatesForEntries(entries){
     const n = entries.length; const dates = new Array(n).fill(null); const markers=[];
     for(let i=n-1;i>=0;i--){ const v=entries[i][1]; if(v && v.fecha){ markers.push(i);} }
@@ -98,9 +95,7 @@ window.addEventListener("load", () => {
     }
     return dates;
   }
-
   function makeTimestampWithDate(isoDate, v){ const h=v.hora||v.tiempo||'00:00:00'; return `${isoDate} ${h}`; }
-  
   function makeTimestamp(v){
     const isoDate = toIsoDate(v.fecha);
     const h = v.hora || v.tiempo || '00:00:00';
@@ -115,7 +110,6 @@ window.addEventListener("load", () => {
     this.keys= new Array(MAX_POINTS).fill(null);
     this.count = 0; // <<-- NUEVO: cuántos puntos válidos hay ya pintados (0..MAX_POINTS)
   }
-
   function updateYAxisRange(divId, yValues){
     // Calcular el máximo dentro de los últimos (hasta) 24 puntos y fijar el eje Y
     const finite = (yValues||[]).filter(v => Number.isFinite(v) && v >= 0);
@@ -127,53 +121,32 @@ window.addEventListener("load", () => {
       'yaxis.range': [0, upper]
     });
   }
-
-  // 👇 flag global para activar/desactivar fechas en todos los ticks
-const DEBUG_SHOW_FULL_DATE = false; // poner en false para volver al modo normal
-
-function updateXAxisTicks(divId, xVals, labels){
-  const tickvals = Array.isArray(xVals) ? xVals : [];
-  const vals = Array.isArray(labels) ? labels : [];
-  const ticktext = [];
-
-  let prevDate = null;
-  let seen = false;
-
-  for(let i=0; i<vals.length; i++){
-    const s = String(vals[i] ?? '');
-    const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
-    let datePart = '', timePart = '';
-    if(m){
-      datePart = m[1];
-      timePart = m[2];
-    } else {
-      const parts = s.split(/\s+/);
-      datePart = parts[0] || '';
-      timePart = parts[1] || parts[0] || '';
-    }
-    const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
-    const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
-
-    if (DEBUG_SHOW_FULL_DATE) {
-      // 👇 siempre mostrar fecha y hora (debug)
-      ticktext.push(`${hhmm}<br>${dispDate}`);
-    } else {
-      // 👇 comportamiento original
+        function updateXAxisTicks(divId, xVals, labels){
+    const tickvals = Array.isArray(xVals) ? xVals : [];
+    const vals = Array.isArray(labels) ? labels : [];
+    const ticktext = [];
+    let prevDate = null;
+    let seen = false;
+    for(let i=0; i<vals.length; i++){
+      const s = String(vals[i] ?? '');
+      const m = s.match(/^(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
+      let datePart = '', timePart = '';
+      if(m){ datePart = m[1]; timePart = m[2]; }
+      else { const parts = s.split(/\s+/); datePart = parts[0] || ''; timePart = parts[1] || parts[0] || ''; }
+      const hhmm = (timePart || '').split(':').slice(0,2).join(':') || s;
       const isFirstNonEmpty = (!seen && !!datePart);
       const dateChanged = datePart && prevDate && (datePart !== prevDate);
       const showDate = isFirstNonEmpty || dateChanged;
+      const dispDate = datePart ? datePart.split('-').slice(0,3).reverse().join('-') : '';
       ticktext.push(showDate && datePart ? `${hhmm}<br>${dispDate}` : hhmm);
+      if(datePart){ if(!seen) seen = true; prevDate = datePart; }
     }
-
-    if(datePart){ if(!seen) seen = true; prevDate = datePart; }
+    Plotly.relayout(divId, {
+      'xaxis.tickmode': 'array',
+      'xaxis.tickvals': tickvals,
+      'xaxis.ticktext': ticktext
+    });
   }
-
-  Plotly.relayout(divId, {
-    'xaxis.tickmode': 'array',
-    'xaxis.tickvals': tickvals,
-    'xaxis.ticktext': ticktext
-  });
-}
   BarSeries.prototype.addPoint = function(key, label, value) {
     if (this.keys.includes(key)) return; // evitar duplicados
 
