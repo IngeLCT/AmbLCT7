@@ -1,14 +1,4 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyCrXP59_tqclwCfbPxw8j0VRhi2WMirEgI",
-  authDomain: "ambientelct.firebaseapp.com",
-  projectId: "ambientelct",
-  storageBucket: "ambientelct.firebasestorage.app",
-  messagingSenderId: "235996067091",
-  appId: "1:235996067091:web:1403de3576c14b278e56e6",
-  measurementId: "G-LLKLK0T3VC"
-};
 
-firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // Inicializa la librería de alerta (usa el umbral definido dentro de stale-alert.js)
